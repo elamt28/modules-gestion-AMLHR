@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono-Gestion : Le Bilan Comptable - CFA Interpro de Chartres</title>
+    <style>
+        :root {
+            --primary: #3b82f6; /* Bleu pro */
+            --secondary: #facc15; /* Jaune vif */
+            --accent: #f43f5e; /* Rose/Rouge accent */
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Impact', sans-serif;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: block;
+        }
+
+        .app-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            box-shadow: 8px 8px 0px var(--dark);
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+        }
+
+        /* --- Écran d'accueil --- */
+        #welcome-screen {
+            position: absolute;
+            inset: 0;
+            background: var(--light);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background-image: radial-gradient(circle at center, #ffffff 0%, #cbd5e1 100%);
+        }
+        
+        #welcome-screen h1 { color: var(--primary); font-size: 32pt; margin-bottom: 10px; text-shadow: 3px 3px 0px var(--secondary); }
+        #welcome-screen p { font-size: 14pt; color: #475569; margin-bottom: 30px; font-weight: bold;}
+        
+        .btn-start {
+            background: var(--secondary); color: var(--dark); border: 4px solid var(--dark);
+            padding: 20px 40px; font-size: 18pt; font-weight: bold; border-radius: 12px;
+            cursor: pointer; box-shadow: 6px 6px 0px var(--dark); transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        .btn-start:hover { transform: translate(2px, 2px); box-shadow: 4px 4px 0px var(--dark); background: #fde047; }
+        .btn-start:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px var(--dark); }
+
+        header {
+            background: var(--primary); padding: 20px; text-align: center; border-bottom: 4px solid var(--dark); position: relative;
+        }
+        header h1 { margin: 0; font-size: 24pt; text-transform: uppercase; letter-spacing: 1px; color: white; text-shadow: 2px 2px 0px var(--dark); }
+        header p { margin: 5px 0 0 0; font-size: 12pt; font-style: italic; font-weight: bold; color: #e0f2fe; }
+
+        #main-interface { display: none; }
+
+        .progress-bar { display: table; width: 100%; background: #e2e8f0; border-bottom: 4px solid var(--dark); }
+        .progress-step {
+            display: table-cell; text-align: center; padding: 10px 5px; font-size: 9.5pt; font-weight: bold;
+            border-right: 2px solid var(--dark); cursor: pointer; background: #fff; transition: all 0.2s ease;
+        }
+        .progress-step.active { background: var(--accent); color: white; }
+        .progress-step:last-child { border-right: none; }
+
+        .content-section { padding: 30px; display: none; }
+        .content-section.active { display: block; }
+
+        h2 { color: var(--primary); font-size: 18pt; border-bottom: 3px solid var(--dark); padding-bottom: 5px; margin-top: 0; }
+        h3 { color: var(--dark); font-size: 14pt; background: #bfdbfe; display: inline-block; padding: 5px 10px; border: 2px solid var(--dark); transform: rotate(-1deg); margin-bottom: 15px; }
+        p, li { font-size: 11.5pt; line-height: 1.6; }
+
+        .visual-panel {
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 100%); border: 4px solid var(--dark);
+            border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; box-shadow: 6px 6px 0px var(--dark);
+            display: flex; justify-content: center; gap: 20px; align-items: center; animation: popIn 0.5s ease-out;
+        }
+        .visual-panel.synthesis { background: linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%); flex-direction: column; }
+        
+        .cartoon-svg { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .cartoon-svg:hover { transform: scale(1.1) rotate(2deg); }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 3px solid var(--dark); box-shadow: 4px 4px 0px var(--dark); }
+        th, td { border: 2px solid var(--dark); padding: 12px; text-align: left; font-size: 10.5pt; }
+        th { background: var(--secondary); color: var(--dark); font-weight: bold; text-transform: uppercase; }
+        tr:nth-child(even) { background: #f8fafc; }
+
+        .exercise-box {
+            background: #e0f2fe; border: 4px solid var(--dark); border-radius: 12px; padding: 20px;
+            margin: 25px 0; box-shadow: 6px 6px 0px var(--dark); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .exercise-title { font-weight: bold; font-size: 13pt; margin-bottom: 10px; color: var(--dark); text-transform: uppercase; display: block; }
+
+        .btn {
+            background: var(--accent); color: white; border: 3px solid var(--dark); padding: 10px 20px;
+            font-size: 11.5pt; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 3px 3px 0px var(--dark); transition: all 0.1s ease; margin-top: 10px;
+        }
+        .btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px var(--dark); background: #e11d48;}
+        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--dark); }
+
+        .feedback { margin-top: 15px; padding: 15px; border: 3px solid var(--dark); border-radius: 8px; display: none; font-weight: bold; font-size: 11pt; }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; animation: shake 0.4s ease-in-out; }
+
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
+
+        .critic-block { background: #ffedd5; border-left: 6px solid #f97316; padding: 12px; margin-top: 12px; font-size: 10.5pt; border-radius: 0 8px 8px 0; border: 2px solid var(--dark); border-left-width: 6px;}
+        .critic-title { font-weight: bold; color: #c2410c; margin-bottom: 6px; font-size: 11pt; }
+
+        .nav-buttons { display: block; padding: 20px 30px; background: #f1f5f9; border-top: 4px solid var(--dark); }
+        .nav-buttons::after { content: ""; clear: both; display: table; }
+        .btn-nav { background: var(--dark); color: white; border: 2px solid var(--dark); padding: 10px 25px; font-size: 11pt; font-weight: bold; border-radius: 8px; cursor: pointer; float: right; transition: all 0.2s; }
+        .btn-nav:first-child { float: left; }
+        .btn-nav.skip-mode { background: #fbbf24; color: #000; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
+        select, input[type="radio"] { margin: 8px 0; padding: 8px; font-size: 11pt; border: 2px solid var(--dark); border-radius: 6px; font-weight: bold;}
+        .radio-group { margin-bottom: 12px; }
+        .radio-group label { margin-left: 8px; cursor: pointer; }
+        .sound-badge { position: absolute; top: 10px; right: 10px; background: white; border: 3px solid var(--dark); border-radius: 20px; padding: 5px 10px; font-size: 10pt; font-weight: bold; box-shadow: 2px 2px 0 var(--dark); color: var(--dark);}
+
+        .qcm-question { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #94a3b8; }
+        .qcm-question:last-child { border-bottom: none; }
+        .qcm-question p { font-weight: bold; margin-bottom: 8px; color: #0f172a;}
+        
+        .assoc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 8px; border: 2px solid var(--dark); }
+        .assoc-term { font-weight: bold; color: var(--primary); font-size: 11pt; width: 30%; }
+        .assoc-select { width: 65%; margin: 0; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div id="welcome-screen">
+        <svg class="cartoon-svg" width="140" height="120" viewBox="0 0 140 120" style="margin-bottom: 20px;">
+            <rect x="20" y="30" width="100" height="70" rx="10" fill="#3b82f6" stroke="#1e293b" stroke-width="5"/>
+            <rect x="40" y="15" width="30" height="15" rx="5" fill="#facc15" stroke="#1e293b" stroke-width="5"/>
+            <circle cx="70" cy="65" r="25" fill="#e2e8f0" stroke="#1e293b" stroke-width="5"/>
+            <circle cx="70" cy="65" r="15" fill="#1e293b"/>
+            <circle cx="75" cy="60" r="4" fill="#ffffff"/>
+            <circle cx="35" cy="45" r="5" fill="#f43f5e" stroke="#1e293b" stroke-width="2"/>
+        </svg>
+        <h1>📸 Prêt pour le Flash ?</h1>
+        <p>Découvrez les fondements du Bilan Comptable, la photographie de votre entreprise.</p>
+        <button class="btn-start" onclick="startCourse()">Lancer l'Analyse</button>
+    </div>
+
+    <div id="main-interface">
+        <header>
+            <div class="sound-badge">🔊 Audio Actif</div>
+            <h1>Le Bilan : La Photo du Patrimoine 📸</h1>
+            <p>— Module Spécial Apprentis AMLHR (Hôtellerie-Restauration) - CFA Interpro</p>
+        </header>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-step active" onclick="handleStepClick(0)">1. Définition</div>
+            <div class="progress-step" onclick="handleStepClick(1)">2. L'Actif</div>
+            <div class="progress-step" onclick="handleStepClick(2)">3. Le Passif</div>
+            <div class="progress-step" onclick="handleStepClick(3)">4. Synthèse</div>
+            <div class="progress-step" onclick="handleStepClick(4)">5. Points Clés</div>
+            <div class="progress-step" onclick="handleStepClick(5)">Évaluation</div>
+        </div>
+
+        <div class="content-section" id="sec0">
+            <h2>1. Définition et Rôle du Bilan</h2>
+            <p>Dans le domaine de la gestion, le bilan n'est pas un roman, c'est une <strong>photographie</strong> ! C'est un document de synthèse obligatoire qui représente l'état patrimonial de votre établissement (comme un complexe hôtelier sur la Place des Épars ou votre fameux food-truck de galettes <strong>« Marche ou Crêpes »</strong>) à un <strong>instant T</strong>.</p>
+            
+            <div class="visual-panel">
+                <svg class="cartoon-svg" width="200" height="100" viewBox="0 0 200 100">
+                    <rect x="10" y="10" width="180" height="80" rx="10" fill="#ffffff" stroke="#1e293b" stroke-width="4"/>
+                    <line x1="100" y1="10" x2="100" y2="90" stroke="#1e293b" stroke-width="4" stroke-dasharray="5,5"/>
+                    <text x="55" y="55" font-size="16" font-weight="bold" text-anchor="middle" fill="#3b82f6">ACTIF</text>
+                    <text x="145" y="55" font-size="16" font-weight="bold" text-anchor="middle" fill="#f43f5e">PASSIF</text>
+                    <text x="100" y="80" font-size="20" font-weight="bold" text-anchor="middle" fill="#1e293b">=</text>
+                </svg>
+            </div>
+
+            <p><strong>Ses 4 caractéristiques absolues :</strong></p>
+            <ul>
+                <li><strong>Périodicité :</strong> Produit chaque année (à l'arrêté des comptes).</li>
+                <li><strong>Nature :</strong> Une photo à un instant T (ce n'est pas un film de l'année, ça c'est le compte de résultat !).</li>
+                <li><strong>Objectif :</strong> Analyser la solvabilité (ce que je possède VS ce que je dois).</li>
+                <li><strong>Équilibre sacré :</strong> Total ACTIF <strong>doit toujours être strictement égal</strong> au Total PASSIF.</li>
+            </ul>
+
+            <div class="exercise-box" style="background-color: #fef08a;">
+                <span class="exercise-title">🎯 Exercice Flash : Le Flash de l'Appareil</span>
+                <p>Si vous demandez le bilan de l'Auberge "Le Repos du Guerrier" édité le 31 décembre, que regardez-vous ?</p>
+                <div class="radio-group">
+                    <input type="radio" id="q0_1" name="q0" value="film"> <label for="q0_1">Un film montrant toutes les nuitées et repas vendus dans l'année.</label><br>
+                    <input type="radio" id="q0_2" name="q0" value="photo"> <label for="q0_2">Une photographie exacte de ce qu'elle possède et doit à la seconde près ce 31 décembre.</label><br>
+                </div>
+                <button class="btn" style="background-color: #3b82f6;" onclick="checkIntro()">Développer la photo</button>
+                <div class="feedback" id="fb0"></div>
+            </div>
+        </div>
+
+        <div class="content-section" id="sec1">
+            <h2>2. L'Actif du Bilan : Les Possessions</h2>
+            <p>L'actif est positionné à <strong>gauche</strong> (au débit). Il représente tout ce que l'entreprise <strong>possède</strong> et qui a une valeur économique positive.</p>
+            
+            <h3>Composition de l'Actif</h3>
+            <table>
+                <thead>
+                    <tr><th>Poste (Compte)</th><th>Description</th><th>Exemple pour un Hôtel-Restaurant</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Immobilisations (2)</strong></td><td>Droits et outils utilisés sur plusieurs années.</td><td>Les lits des chambres, le piano de cuisson, la navette VIP.</td></tr>
+                    <tr><td><strong>Stocks (3)</strong></td><td>Éléments destinés à être vendus ou transformés.</td><td>Les bouteilles de la cave, la viande en chambre froide, les draps neufs.</td></tr>
+                    <tr><td><strong>Clients (4)</strong></td><td>Créances (factures non payées par les clients).</td><td>L'ardoise d'une entreprise suite à un séminaire ou un banquet.</td></tr>
+                    <tr><td><strong>Trésorerie (5)</strong></td><td>Disponibilités immédiates.</td><td>L'argent dans le tiroir-caisse de la réception et sur le compte banque.</td></tr>
+                </tbody>
+            </table>
+            
+            <p>💧 <strong>Le principe de Liquidité Croissante :</strong><br>
+            L'actif est classé du haut vers le bas selon la vitesse à laquelle on peut le transformer en cash. <br>
+            <em>Haut = Immobilisations (dur à vendre vite) ➔ Milieu = Stocks/Clients ➔ Bas = Trésorerie (cash immédiat).</em></p>
+
+            <div class="exercise-box" style="background-color: #fef08a;">
+                <span class="exercise-title">🎯 Mission : La Course à la Liquidité</span>
+                <p>Classez ces éléments de l'actif du moins liquide (en haut du bilan) au plus liquide (en bas) :</p>
+                <p><em>A: 500€ dans la caisse de la réception. <br> B: Le grand piano de cuisson professionnel. <br> C: Un stock de 50 bouteilles de Champagne.</em></p>
+                <select id="q1_select">
+                    <option value="">-- Choisissez le bon ordre (Haut -> Bas) --</option>
+                    <option value="false1">A -> C -> B</option>
+                    <option value="correct">B -> C -> A</option>
+                    <option value="false2">C -> B -> A</option>
+                </select>
+                <br>
+                <button class="btn" style="background-color: #3b82f6;" onclick="checkActif()">Vérifier le classement</button>
+                <div class="feedback" id="fb1"></div>
+            </div>
+        </div>
+
+        <div class="content-section" id="sec2">
+            <h2>3. Le Passif du Bilan : Les Dettes</h2>
+            <p>Le passif est positionné à <strong>droite</strong> (au crédit). Il représente une valeur économique négative : c'est <strong>ce que l'entreprise doit</strong> (ses obligations envers des tiers).</p>
+            
+            <h3>Composition du Passif</h3>
+            <table>
+                <thead>
+                    <tr><th>Poste (Compte)</th><th>Description</th><th>Particularité</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Capital (1)</strong></td><td>Apports des actionnaires/patrons.</td><td>Oui, l'entreprise "doit" cet argent à ses créateurs !</td></tr>
+                    <tr><td><strong>Emprunts (16)</strong></td><td>Dettes bancaires.</td><td>Souvent à long terme.</td></tr>
+                    <tr><td><strong>Tiers (4)</strong></td><td>Dettes d'exploitation courantes.</td><td>Dettes Fournisseurs (401), État (44), Salariés (421).</td></tr>
+                    <tr><td><strong>Trésorerie (5122)</strong></td><td>Découvert bancaire (Solde négatif).</td><td>La dette la plus urgente à rembourser !</td></tr>
+                </tbody>
+            </table>
+
+            <p>⏳ <strong>Le principe d'Exigibilité Croissante :</strong><br>
+            Le passif est classé du haut vers le bas selon l'urgence de remboursement.<br>
+            <em>Haut = Capital (on ne rembourse presque jamais) ➔ Milieu = Fournisseurs (à payer à 30 jours) ➔ Bas = Découvert (la banque exige le remboursement direct).</em></p>
+
+            <div class="exercise-box" style="background-color: #fef08a;">
+                <span class="exercise-title">🎯 Exercice : La Pression des Créanciers</span>
+                <p>Laquelle de ces dettes se trouve tout en bas du Passif car elle est la plus "exigible" (urgente) ?</p>
+                <select id="q2_select">
+                    <option value="">-- Choisir la dette la plus urgente --</option>
+                    <option value="capital">Le Capital social apporté par les fondateurs</option>
+                    <option value="fournisseur">Une facture de votre fournisseur de linge à payer dans 45 jours</option>
+                    <option value="decouvert">Le découvert bancaire</option>
+                </select>
+                <br>
+                <button class="btn" style="background-color: #3b82f6;" onclick="checkPassif()">Vérifier la pression</button>
+                <div class="feedback" id="fb2"></div>
+            </div>
+        </div>
+
+        <div class="content-section" id="sec3">
+            <h2>4. Synthèse Visuelle de la Structure</h2>
+            <p>Ce tableau croisé est votre carte de navigation. Il illustre la symétrie parfaite entre les Emplois (Actif) et les Ressources (Passif).</p>
+            
+            <div class="visual-panel synthesis">
+                <table style="margin: 0; box-shadow: none; border: none;">
+                    <tr>
+                        <th style="background: #3b82f6; color: white; width: 50%; text-align: center;">ACTIF (Ce que je possède) <br> <small>↓ Liquidité Croissante ↓</small></th>
+                        <th style="background: #f43f5e; color: white; width: 50%; text-align: center;">PASSIF (Ce que je dois) <br> <small>↓ Exigibilité Croissante ↓</small></th>
+                    </tr>
+                    <tr>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Immobilisations</strong> (Outils)</td>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Capital</strong> (Apports)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Stocks</strong> (Ventes futures)</td>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Emprunts</strong> (Financement)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Clients</strong> (Créances à encaisser)</td>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Tiers</strong> (Dettes Fournisseurs, État)</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Trésorerie</strong> (Disponibilités en caisse)</td>
+                        <td style="border: 2px solid #1e293b; background: white;"><strong>Trésorerie Passif</strong> (Découvert)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🧩 Mission Symétrie : Associer les concepts</span>
+                <p>Reliez chaque élément à son camp :</p>
+                
+                <div id="assoc_container">
+                    <div class="assoc-row">
+                        <span class="assoc-term">1. La navette VIP de l'hôtel</span>
+                        <select class="assoc-select" id="assoc_1">
+                            <option value="">-- Actif ou Passif ? --</option>
+                            <option value="A">ACTIF (Immobilisation)</option>
+                            <option value="P">PASSIF (Dette)</option>
+                        </select>
+                    </div>
+                    <div class="assoc-row">
+                        <span class="assoc-term">2. Le prêt fait auprès de la banque</span>
+                        <select class="assoc-select" id="assoc_2">
+                            <option value="">-- Actif ou Passif ? --</option>
+                            <option value="A">ACTIF (Immobilisation)</option>
+                            <option value="P">PASSIF (Dette / Emprunt)</option>
+                        </select>
+                    </div>
+                    <div class="assoc-row">
+                        <span class="assoc-term">3. L'argent sur le compte (positif)</span>
+                        <select class="assoc-select" id="assoc_3">
+                            <option value="">-- Actif ou Passif ? --</option>
+                            <option value="A">ACTIF (Trésorerie disponible)</option>
+                            <option value="P">PASSIF (Dette)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="checkAssociation()">Valider la symétrie</button>
+                <div class="feedback" id="fb_assoc"></div>
+            </div>
+        </div>
+
+        <div class="content-section" id="sec4">
+            <h2>5. Points Clés pour la Gestion</h2>
+            
+            <ul>
+                <li><strong>La bipolarité de la Trésorerie :</strong> À l'actif, on l'appelle "trésorerie disponible". Mais attention, si votre compte passe en rouge (découvert), la banque devient un créancier ! Ce montant bascule alors obligatoirement au <strong>Passif</strong>.</li>
+                <li><strong>Un Client au Passif ?</strong> C'est rare mais possible ! Si un client vous verse un <em>acompte</em> avant la livraison, vous lui devez un service ou un remboursement. Cet acompte devient une dette (Passif).</li>
+                <li><strong>Cap vers le Bilan Fonctionnel :</strong> Le bilan comptable est figé. L'étape suivante pour un manager sera de le transformer en "bilan fonctionnel" pour calculer le Fonds de Roulement (FR) et le Besoin en Fonds de Roulement (BFR).</li>
+            </ul>
+
+            <blockquote>
+                <em>« Le bilan peut être considéré comme l’état patrimonial de l’entreprise, il indique d’un côté ce qu’elle possède et de l’autre côté, ce qu’elle doit. »</em>
+            </blockquote>
+        </div>
+
+        <div class="content-section" id="sec5">
+            <h2>L'Évaluation du Bilan 📋</h2>
+            <p>Dernière étape pour valider vos compétences en gestion de patrimoine d'entreprise !</p>
+
+            <div class="exercise-box" style="background-color: #e2e8f0; border-color: #1e293b;">
+                <span class="exercise-title" style="color: #1e293b;">📝 Le Grand QCM (10 questions)</span>
+                
+                <div class="qcm-question"><p>1. Qu'est-ce qu'un bilan comptable fondamentalement ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm1" value="A"> <label>Un film vidéo des ventes de l'année.</label>
+                    <input type="radio" name="qcm1" value="B"> <label>Une photographie de l'état patrimonial à un instant T.</label></div>
+                </div>
+                <div class="qcm-question"><p>2. Quelle est la périodicité obligatoire de production du bilan ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm2" value="A"> <label>Chaque semaine.</label>
+                    <input type="radio" name="qcm2" value="B"> <label>Chaque année (à l'arrêté des comptes).</label></div>
+                </div>
+                <div class="qcm-question"><p>3. La règle d'or d'équilibre du bilan stipule que :</p>
+                    <div class="radio-group"><input type="radio" name="qcm3" value="A"> <label>Le total de l'Actif doit être égal au total du Passif.</label>
+                    <input type="radio" name="qcm3" value="B"> <label>L'Actif doit toujours être supérieur au Passif.</label></div>
+                </div>
+                <div class="qcm-question"><p>4. Que représente globalement l'Actif ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm4" value="A"> <label>Ce que l'entreprise doit.</label>
+                    <input type="radio" name="qcm4" value="B"> <label>Ce que l'entreprise possède.</label></div>
+                </div>
+                <div class="qcm-question"><p>5. De quel côté du tableau se trouve l'Actif ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm5" value="A"> <label>À gauche (au Débit).</label>
+                    <input type="radio" name="qcm5" value="B"> <label>À droite (au Crédit).</label></div>
+                </div>
+                <div class="qcm-question"><p>6. Selon quel principe les éléments de l'Actif sont-ils classés de haut en bas ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm6" value="A"> <label>Ordre alphabétique.</label>
+                    <input type="radio" name="qcm6" value="B"> <label>Liquidité croissante.</label></div>
+                </div>
+                <div class="qcm-question"><p>7. Que représente globalement le Passif ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm7" value="A"> <label>Ce que l'entreprise doit (ses dettes).</label>
+                    <input type="radio" name="qcm7" value="B"> <label>Ce que l'entreprise possède.</label></div>
+                </div>
+                <div class="qcm-question"><p>8. Selon quel principe les éléments du Passif sont-ils classés de haut en bas ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm8" value="A"> <label>Exigibilité croissante.</label>
+                    <input type="radio" name="qcm8" value="B"> <label>Taille du fournisseur.</label></div>
+                </div>
+                <div class="qcm-question"><p>9. Si le compte bancaire est à découvert (négatif), où doit-il figurer ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm9" value="A"> <label>Au bas de l'Actif.</label>
+                    <input type="radio" name="qcm9" value="B"> <label>Au bas du Passif.</label></div>
+                </div>
+                <div class="qcm-question"><p>10. Quelle est l'étape d'analyse suivante pour un manager après avoir lu le bilan comptable ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm10" value="A"> <label>Le jeter car il est figé.</label>
+                    <input type="radio" name="qcm10" value="B"> <label>Créer un Bilan Fonctionnel (pour analyser le FR et le BFR).</label></div>
+                </div>
+
+                <button class="btn" style="background: var(--primary); color: white;" onclick="checkGrandQCM()">Corriger l'Évaluation</button>
+                <div class="feedback" id="fb_qcm"></div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="btnPrev" onclick="changeSection(-1)" style="visibility: hidden;">◀ Rétropédaler</button>
+            <button class="btn-nav" id="btnNext" onclick="changeSection(1)">Avancer ▶</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- VARIABLES GLOBALES ET MOTEUR AUDIO ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let originalSections = [];
+    let isTyping = false;
+    let skipTyping = false;
+    let currentIdx = 0;
+    let globalTypeCounter = 0;
+    const totalSections = 6; 
+
+    document.addEventListener("DOMContentLoaded", () => {
+        for (let i = 0; i < totalSections; i++) {
+            const sec = document.getElementById(`sec${i}`);
+            if(sec) {
+                originalSections[i] = sec.cloneNode(true);
+                sec.innerHTML = ''; 
+                sec.classList.remove('active');
+            }
+        }
+    });
+
+    function startCourse() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-interface').style.display = 'block';
+        playSound('nav');
+        showSection(0);
+    }
+
+    function playSound(type) {
+        if (!audioCtx || audioCtx.state === 'suspended') return;
+        const now = audioCtx.currentTime;
+        if (type === 'nav') {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'success' || type === 'fanfare') {
+            const notes = type === 'success' ? [440, 554.37, 659.25, 880] : [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'triangle'; osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, now + i * 0.1); gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.02);
+                gain.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.2);
+                osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.2);
+            });
+        } else if (type === 'error') {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        }
+    }
+
+    let lastTick = 0;
+    function playTick() {
+        if (!audioCtx || audioCtx.state === 'suspended') return;
+        const now = audioCtx.currentTime;
+        if (now - lastTick < 0.03) return; 
+        lastTick = now;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(600 + Math.random() * 200, now); 
+        gain.gain.setValueAtTime(0.015, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+        osc.start(now); osc.stop(now + 0.02);
+    }
+
+    async function typeNode(node, container, counter) {
+        if (counter !== globalTypeCounter) return;
+        if (skipTyping) { container.appendChild(node.cloneNode(true)); return; }
+
+        if (node.nodeType === 1) { 
+            if (node.classList && (node.classList.contains('visual-panel') || node.classList.contains('exercise-box'))) {
+                container.appendChild(node.cloneNode(true)); return;
+            }
+            const clone = node.cloneNode(false);
+            container.appendChild(clone);
+            for (let child of Array.from(node.childNodes)) { await typeNode(child, clone, counter); }
+        } else if (node.nodeType === 3) { 
+            const text = node.nodeValue;
+            if (!text.trim()) { container.appendChild(document.createTextNode(text)); return; }
+            let textNode = document.createTextNode('');
+            container.appendChild(textNode);
+            const charArray = Array.from(text); 
+            let i = 0; const charsPerFrame = 3; 
+            while(i < charArray.length) {
+                if (counter !== globalTypeCounter) return;
+                if (skipTyping) { textNode.nodeValue = text; break; }
+                let chunk = '';
+                for(let j=0; j < charsPerFrame && i < charArray.length; j++, i++) chunk += charArray[i];
+                textNode.nodeValue += chunk;
+                if (i % 6 === 0) playTick();
+                await new Promise(r => requestAnimationFrame(r));
+            }
+        }
+    }
+
+    async function showSection(idx) {
+        if (idx < 0 || idx >= totalSections) return;
+        globalTypeCounter++; const currentCounter = globalTypeCounter;
+        if(document.getElementById(`sec${currentIdx}`)) document.getElementById(`sec${currentIdx}`).classList.remove('active');
+        document.querySelectorAll('.progress-step')[currentIdx]?.classList.remove('active');
+        currentIdx = idx;
+        const targetSec = document.getElementById(`sec${currentIdx}`);
+        targetSec.classList.add('active');
+        document.querySelectorAll('.progress-step')[currentIdx].classList.add('active');
+        document.getElementById('btnPrev').style.visibility = (currentIdx === 0) ? 'hidden' : 'visible';
+        targetSec.innerHTML = ''; skipTyping = false; isTyping = true;
+        updateNextButton();
+
+        for (let child of Array.from(originalSections[idx].childNodes)) {
+            if (currentCounter !== globalTypeCounter) return;
+            if (skipTyping) targetSec.appendChild(child.cloneNode(true));
+            else await typeNode(child, targetSec, currentCounter);
+        }
+        if (currentCounter === globalTypeCounter) { isTyping = false; updateNextButton(); }
+    }
+
+    function updateNextButton() {
+        const btn = document.getElementById('btnNext');
+        if (isTyping) { btn.innerText = "Accélérer l'animation ⏩"; btn.classList.add('skip-mode'); } 
+        else { btn.innerText = (currentIdx === totalSections - 1) ? "Terminer la leçon 🏁" : "Avancer ▶"; btn.classList.remove('skip-mode'); }
+    }
+
+    function handleStepClick(idx) {
+        playSound('nav');
+        if (isTyping && idx === currentIdx) { skipTyping = true; return; }
+        showSection(idx);
+    }
+
+    function changeSection(direction) {
+        playSound('nav');
+        if (isTyping && direction > 0) { skipTyping = true; return; }
+        let target = currentIdx + direction;
+        if (target >= 0 && target < totalSections) { showSection(target); window.scrollTo(0, 0); }
+    }
+
+    // --- CORRECTIONS ---
+    function checkIntro() {
+        const choice = document.querySelector('input[name="q0"]:checked');
+        const fb = document.getElementById('fb0');
+        if (!choice) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Sélectionnez une option !"; return; }
+
+        if (choice.value === "photo") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 EXACT ! Le bilan est statique. <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>C'est le compte de résultat qui fait office de 'film' de l'année. Le bilan, c'est la photo du patrimoine le jour J, garantie 100% logique comptable.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Faux. Le film, c'est le compte de résultat. Le bilan fige le patrimoine à un moment précis !";
+        }
+    }
+
+    function checkActif() {
+        const val = document.getElementById('q1_select').value;
+        const fb = document.getElementById('fb1');
+        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Veuillez choisir un ordre !"; return; }
+
+        if (val === "correct") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 PARFAIT ! Le Piano de cuisson (Immo) -> Le Champagne (Stock) -> La Caisse (Tréso). <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>Classement validé selon le Plan Comptable Général. On passe de l'outil durable à l'argent purement liquide.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Erreur. N'oubliez pas : on part du plus difficile à vendre (Immobilisation) vers le cash pur (Trésorerie).";
+        }
+    }
+
+    function checkPassif() {
+        const val = document.getElementById('q2_select').value;
+        const fb = document.getElementById('fb2');
+        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Sélectionnez une dette !"; return; }
+
+        if (val === "decouvert") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 C'EST ÇA ! Le banquier veut son argent immédiatement. <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>Le principe d'exigibilité croissante place logiquement la trésorerie négative tout en bas du passif, car c'est la dette à très court terme par excellence.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Mauvais choix. Le capital n'est jamais réclamé, et le fournisseur vous laisse 45 jours. Le découvert, lui, coûte des agios tous les jours !";
+        }
+    }
+
+    function checkAssociation() {
+        const a1 = document.getElementById('assoc_1').value;
+        const a2 = document.getElementById('assoc_2').value;
+        const a3 = document.getElementById('assoc_3').value;
+        const fb = document.getElementById('fb_assoc');
+
+        if (!a1 || !a2 || !a3) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Reliez tous les concepts !"; return; }
+
+        if (a1 === "A" && a2 === "P" && a3 === "A") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 SYMÉTRIE VALIDÉE ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>L'outil de travail (navette VIP) et le cash sont vos possessions. Le prêt est l'origine du financement (la dette). La logique Actif/Passif est respectée.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Déséquilibre détecté ! Un prêt est toujours une dette (Passif). Ce que vous possédez (matériel, argent dispo) va à l'Actif.";
+        }
+    }
+
+    function checkGrandQCM() {
+        const correctAnswers = ['B', 'B', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'B'];
+        let score = 0, missing = false;
+
+        for (let i = 1; i <= 10; i++) {
+            const choice = document.querySelector(`input[name="qcm${i}"]:checked`);
+            if (!choice) { missing = true; break; }
+            if (choice.value === correctAnswers[i-1]) score++;
+        }
+
+        const fb = document.getElementById('fb_qcm');
+        if (missing) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Vous devez répondre aux 10 questions avant de valider !"; return; }
+
+        if (score >= 8) {
+            playSound('fanfare'); fb.className = "feedback success";
+            fb.innerHTML = `🏆 EXCELLENT ! Score : ${score}/10. Vous maîtrisez le Bilan ! <div class='critic-block'><div class='critic-title'>🔍 Bilan Certifié :</div>Compétences en lecture patrimoniale acquises. Prêt pour l'étape du bilan fonctionnel.</div>`;
+        } else if (score >= 5) {
+            playSound('success'); fb.className = "feedback success"; fb.innerHTML = `✅ CORRECT. Score : ${score}/10. Vous avez l'équilibre, mais revoyez les principes de liquidité/exigibilité.`;
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = `❌ CRASH. Score : ${score}/10. Le bilan est déséquilibré ! Relisez bien la leçon.`;
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono-Gestion : Pilotage des Flux Financiers - CFA Interpro de Chartres</title>
+    <style>
+        /* */
+        :root {
+            --primary: #0ea5e9; /* Sky blue (Aviation) */
+            --secondary: #10b981; /* Emerald (Cash/Ok) */
+            --accent: #f59e0b; /* Amber (Warning/Fuel) */
+            --dark: #0f172a;
+            --light: #f0f9ff;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Impact', sans-serif;
+        }
+
+        body {
+            background-color: #e0f2fe;
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: block;
+        }
+
+        .app-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            box-shadow: 8px 8px 0px var(--dark);
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+        }
+
+        /* */
+        #welcome-screen {
+            position: absolute;
+            inset: 0;
+            background: var(--light);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background-image: radial-gradient(circle at center, #ffffff 0%, #bae6fd 100%);
+        }
+        
+        #welcome-screen h1 { color: var(--primary); font-size: 32pt; margin-bottom: 10px; text-shadow: 3px 3px 0px var(--dark); color: white;}
+        #welcome-screen p { font-size: 14pt; color: #334155; margin-bottom: 30px; font-weight: bold;}
+        
+        .btn-start {
+            background: var(--accent); color: var(--dark); border: 4px solid var(--dark);
+            padding: 20px 40px; font-size: 18pt; font-weight: bold; border-radius: 12px;
+            cursor: pointer; box-shadow: 6px 6px 0px var(--dark); transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        .btn-start:hover { transform: translate(2px, 2px); box-shadow: 4px 4px 0px var(--dark); background: #fbbf24; }
+        .btn-start:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px var(--dark); }
+
+        header {
+            background: var(--primary); padding: 20px; text-align: center; border-bottom: 4px solid var(--dark); position: relative;
+        }
+        header h1 { margin: 0; font-size: 24pt; text-transform: uppercase; letter-spacing: 1px; color: white; text-shadow: 2px 2px 0px var(--dark); }
+        header p { margin: 5px 0 0 0; font-size: 12pt; font-style: italic; font-weight: bold; color: #e0f2fe; }
+
+        /* */
+        #main-interface { display: none; }
+
+        .progress-bar { display: table; width: 100%; background: #e2e8f0; border-bottom: 4px solid var(--dark); }
+        .progress-step {
+            display: table-cell; text-align: center; padding: 10px 5px; font-size: 9.5pt; font-weight: bold;
+            border-right: 2px solid var(--dark); cursor: pointer; background: #fff; transition: all 0.2s ease;
+        }
+        .progress-step.active { background: var(--primary); color: white; }
+        .progress-step:last-child { border-right: none; }
+
+        .content-section { padding: 30px; display: none; }
+        .content-section.active { display: block; }
+
+        h2 { color: var(--primary); font-size: 18pt; border-bottom: 3px solid var(--dark); padding-bottom: 5px; margin-top: 0; }
+        h3 { color: var(--dark); font-size: 14pt; background: #fef08a; display: inline-block; padding: 5px 10px; border: 2px solid var(--dark); transform: rotate(-1deg); margin-bottom: 15px; }
+        p, li { font-size: 11.5pt; line-height: 1.6; }
+
+        /* */
+        .visual-panel {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border: 4px solid var(--dark);
+            border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; box-shadow: 6px 6px 0px var(--dark);
+            display: flex; justify-content: center; gap: 20px; align-items: center; animation: popIn 0.5s ease-out; flex-direction: column;
+        }
+        
+        .cartoon-svg { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .cartoon-svg:hover { transform: scale(1.1) rotate(3deg); }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 3px solid var(--dark); box-shadow: 4px 4px 0px var(--dark); }
+        th, td { border: 2px solid var(--dark); padding: 12px; text-align: left; font-size: 10.5pt; }
+        th { background: #bae6fd; color: var(--dark); font-weight: bold; text-transform: uppercase; }
+        tr:nth-child(even) { background: #f8fafc; }
+
+        .exercise-box {
+            background: #ffedd5; border: 4px solid var(--dark); border-radius: 12px; padding: 20px;
+            margin: 25px 0; box-shadow: 6px 6px 0px var(--dark); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .exercise-title { font-weight: bold; font-size: 13pt; margin-bottom: 10px; color: var(--dark); text-transform: uppercase; display: block; }
+
+        .btn {
+            background: var(--primary); color: white; border: 3px solid var(--dark); padding: 10px 20px;
+            font-size: 11.5pt; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 3px 3px 0px var(--dark); transition: all 0.1s ease; margin-top: 10px;
+        }
+        .btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px var(--dark); background: #0284c7;}
+        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--dark); }
+
+        /* */
+        .feedback { margin-top: 15px; padding: 15px; border: 3px solid var(--dark); border-radius: 8px; display: none; font-weight: bold; font-size: 11pt; }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; animation: shake 0.4s ease-in-out; }
+
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
+
+        .critic-block { background: #f0fdf4; border-left: 6px solid #16a34a; padding: 12px; margin-top: 12px; font-size: 10.5pt; border-radius: 0 8px 8px 0; border: 2px solid var(--dark); border-left-width: 6px;}
+        .critic-title { font-weight: bold; color: #15803d; margin-bottom: 6px; font-size: 11pt; }
+
+        .nav-buttons { display: block; padding: 20px 30px; background: #f1f5f9; border-top: 4px solid var(--dark); }
+        .nav-buttons::after { content: ""; clear: both; display: table; }
+        .btn-nav { background: var(--dark); color: white; border: 2px solid var(--dark); padding: 10px 25px; font-size: 11pt; font-weight: bold; border-radius: 8px; cursor: pointer; float: right; transition: all 0.2s; }
+        .btn-nav:first-child { float: left; }
+        .btn-nav.skip-mode { background: var(--accent); color: #000; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+
+        select, input[type="radio"] { margin: 8px 0; padding: 8px; font-size: 11pt; border: 2px solid var(--dark); border-radius: 6px; font-weight: bold; cursor: pointer;}
+        .radio-group { margin-bottom: 12px; }
+        .radio-group label { margin-left: 8px; cursor: pointer; }
+        .sound-badge { position: absolute; top: 10px; right: 10px; background: white; border: 3px solid var(--dark); border-radius: 20px; padding: 5px 10px; font-size: 10pt; font-weight: bold; box-shadow: 2px 2px 0 var(--dark); color: var(--dark);}
+
+        .qcm-question { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #94a3b8; }
+        .qcm-question:last-child { border-bottom: none; }
+        .qcm-question p { font-weight: bold; margin-bottom: 8px; color: #0f172a;}
+        
+        .formula-box { background: white; padding: 15px; border: 3px dashed var(--primary); text-align: center; font-size: 14pt; font-weight: bold; border-radius: 10px; margin: 15px 0; color: var(--dark);}
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- -->
+    <div id="welcome-screen">
+        <svg class="cartoon-svg" width="160" height="160" viewBox="0 0 160 160" style="margin-bottom: 20px;">
+            <circle cx="80" cy="80" r="75" fill="#e0f2fe" stroke="#0f172a" stroke-width="6"/>
+            <!-- Cockpit Glass -->
+            <path d="M 40 80 Q 80 20 120 80 Z" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+            <path d="M 50 75 Q 80 40 110 75" fill="none" stroke="#bae6fd" stroke-width="4"/>
+            <!-- Propeller Base -->
+            <circle cx="80" cy="80" r="15" fill="#f59e0b" stroke="#0f172a" stroke-width="6"/>
+            <!-- Propeller Blades -->
+            <path d="M 80 65 L 70 20 L 90 20 Z" fill="#0f172a"/>
+            <path d="M 80 95 L 70 140 L 90 140 Z" fill="#0f172a"/>
+            <path d="M 65 80 L 20 70 L 20 90 Z" fill="#0f172a"/>
+            <path d="M 95 80 L 140 70 L 140 90 Z" fill="#0f172a"/>
+        </svg>
+        <h1 style="color:var(--primary); text-shadow: 2px 2px 0 white;">✈️ Vol au-dessus des Flux</h1>
+        <p>Prenez les commandes et apprenez à lire vos instruments de pilotage économique.</p>
+        <button class="btn-start" onclick="startCourse()">Décollage 🛫</button>
+    </div>
+
+    <!-- -->
+    <div id="main-interface">
+        <header>
+            <div class="sound-badge">🔊 Audio Actif</div>
+            <h1>Pilotage des Flux Financiers 🛩️</h1>
+            <p>— Masterclass Spéciale AMLHR - CFA Interpro de Chartres</p>
+        </header>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-step active" onclick="handleStepClick(0)">1. Instruments</div>
+            <div class="progress-step" onclick="handleStepClick(1)">2. L'ADN</div>
+            <div class="progress-step" onclick="handleStepClick(2)">3. Le Moteur</div>
+            <div class="progress-step" onclick="handleStepClick(3)">4. La Boussole</div>
+            <div class="progress-step" onclick="handleStepClick(4)">5. Matrice</div>
+            <div class="progress-step" onclick="handleStepClick(5)">Évaluation</div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec0">
+            <h2>I. Le Pilotage Économique : Vos 3 Cadrans</h2>
+            <p>Diriger un établissement, c'est comme piloter un avion. Vous ne pouvez pas voler à l'aveugle ! La <strong>comptabilité</strong> est le langage qui alimente les trois cadrans vitaux de votre tableau de bord :</p>
+            
+            <div class="visual-panel">
+                <div style="display:flex; justify-content:space-around; width:100%;">
+                    <div>
+                        <h3 style="background:#bae6fd;">📈 L'Altimètre</h3>
+                        <p><strong>La Rentabilité</strong><br><small>Sans bénéfice, l'avion perd de l'altitude.</small></p>
+                    </div>
+                    <div>
+                        <h3 style="background:#fef08a;">⛽ La Jauge</h3>
+                        <p><strong>La Trésorerie</strong><br><small>Panne de cash = arrêt net des moteurs !</small></p>
+                    </div>
+                    <div>
+                        <h3 style="background:#e5e7eb;">🧭 La Boussole</h3>
+                        <p><strong>Plan de Financement</strong><br><small>Donne le cap à long terme.</small></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🎯 Mission 1 : Alerte au Cockpit</span>
+                <p>Votre hôtel-restaurant est plein à craquer depuis 6 mois. Pourtant, la banque vous appelle car vous ne pouvez plus payer les salaires (compte à zéro). Quel instrument est dans le rouge vif ?</p>
+                <select id="q0_select">
+                    <option value="">-- Identifiez la panne --</option>
+                    <option value="rentabilite">L'Altimètre (Rentabilité) est en panne.</option>
+                    <option value="treso">La Jauge de carburant (Trésorerie) est vide.</option>
+                    <option value="boussole">La Boussole est déréglée.</option>
+                </select>
+                <br>
+                <button class="btn" onclick="checkIntro()">Scanner les cadrans</button>
+                <div class="feedback" id="fb0"></div>
+            </div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec1">
+            <h2>II. L'ADN Financier : À quel profil appartenez-vous ?</h2>
+            <p>Chaque "appareil" a une mécanique propre. Identifier le vôtre est crucial pour adapter votre pilotage.</p>
+
+            <table>
+                <tr>
+                    <th>🛒 Négoce</th>
+                    <th>🤝 Services</th>
+                    <th>⚙️ Production</th>
+                </tr>
+                <tr>
+                    <td>Achat/Revente en l'état.<br><em>Enjeu :</em> Gérer les stocks et les invendus.</td>
+                    <td>Prestations immatérielles.<br><em>Enjeu :</em> Fidéliser et faire du volume.</td>
+                    <td>Transformation de matières.<br><em>Enjeu :</em> Maîtriser le cycle de fabrication.</td>
+                </tr>
+            </table>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🎯 Cas Particulier : L'Hybride Chartrain</span>
+                <p>Dans votre établissement <strong>« Marche ou Crêpes »</strong>, vous achetez de la farine, des œufs, vous servez les clients à table et vous encaissez. Quel est votre véritable ADN d'après la comptabilité ?</p>
+                <div class="radio-group">
+                    <input type="radio" id="q1_1" name="q1" value="negoce"> <label for="q1_1">Du Négoce pur (je revends des crêpes).</label><br>
+                    <input type="radio" id="q1_2" name="q1" value="service"> <label for="q1_2">Du Service pur (je sers des gens).</label><br>
+                    <input type="radio" id="q1_3" name="q1" value="hybride"> <label for="q1_3">Un Hybride complexe (Prestataire de service ET Transformateur de denrées).</label>
+                </div>
+                <button class="btn" onclick="checkADN()">Analyser l'ADN</button>
+                <div class="feedback" id="fb1"></div>
+            </div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec2">
+            <h2>III. Le Cycle d'Exploitation : Le Moteur</h2>
+            <p>Ce cycle est le mouvement perpétuel qui transforme vos ressources en richesse. Il est rythmé par des flux physiques (marchandises) et des flux monétaires (argent).</p>
+            
+            <div class="formula-box" style="border-color:var(--accent);">
+                🔥 <strong>LA RÈGLE DE SURVIE :</strong> VENTES > ACHATS
+            </div>
+
+            <p>Si vos ventes ne sont pas supérieures à vos achats, vous ne dégagez pas de marge. Sans marge, le moteur s'étouffe.</p>
+            
+            <div class="visual-panel">
+                <p><strong>L'ordre implacable du moteur :</strong><br>
+                1. Achats (Consommation de ressources) ➡️ 2. Décaissements (Sortie de cash)<br>
+                3. Ventes (Création du droit à recevoir) ➡️ 4. Encaissements (Entrée de cash)</p>
+            </div>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🎯 Exercice : La Pompe à Carburant</span>
+                <p>Quel élément fait la "jonction" vitale entre le moment où vous payez vos fournisseurs (Décaissements) et le moment où vos clients vous paient (Encaissements) ?</p>
+                <select id="q2_select">
+                    <option value="">-- Sélectionnez le bon élément --</option>
+                    <option value="treso">La Trésorerie (Le "Carburant" disponible)</option>
+                    <option value="impots">Les Impôts</option>
+                    <option value="benefice">Le Bénéfice théorique</option>
+                </select>
+                <br>
+                <button class="btn" onclick="checkCycle()">Vérifier le circuit</button>
+                <div class="feedback" id="fb2"></div>
+            </div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec3">
+            <h2>IV. La Boussole du Patrimoine : Le Bilan</h2>
+            <p>Le bilan est une <strong>photographie</strong> à un instant T. Il reflète le <em>Concept d'Entité</em> (l'entreprise a sa propre vie, séparée de ses propriétaires).</p>
+            
+            <table>
+                <tr>
+                    <th style="background:#dcfce7;">ACTIF (Ce que l'on possède)</th>
+                    <th style="background:#fee2e2;">PASSIF (Ce que l'on doit)</th>
+                </tr>
+                <tr>
+                    <td><em>Classé par Liquidité Croissante (vers le bas)</em><br><br>
+                        - Immobilisations (Compte 2)<br>
+                        - Stocks (Compte 3)<br>
+                        - <strong>Créances Clients (411)</strong><br>
+                        - <strong>Trésorerie (512)</strong>
+                    </td>
+                    <td><em>Classé par Exigibilité Croissante (vers le bas)</em><br><br>
+                        - Capital (Compte 1) - Dette envers les boss<br>
+                        - Emprunts (Compte 16)<br>
+                        - <strong>Dettes Fournisseurs (401) / Urssaf (43)</strong><br>
+                        - Découvert Bancaire (5122) - Très urgent !
+                    </td>
+                </tr>
+            </table>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🎯 Mission PCG : Où ranger la facture ?</span>
+                <p>Vous venez de recevoir une livraison de boissons pour votre bar. Vous n'avez pas encore payé le livreur. Où cette dette immédiate s'inscrit-elle sur votre boussole ?</p>
+                <div class="radio-group">
+                    <input type="radio" id="q3_1" name="q3" value="411"> <label for="q3_1">À l'Actif, en Créances Clients (411).</label><br>
+                    <input type="radio" id="q3_2" name="q3" value="401"> <label for="q3_2">Au Passif, en Dettes Fournisseurs (401).</label><br>
+                    <input type="radio" id="q3_3" name="q3" value="16"> <label for="q3_3">Au Passif, en Emprunts long terme (16).</label>
+                </div>
+                <button class="btn" onclick="checkBilan()">Ranger le document</button>
+                <div class="feedback" id="fb3"></div>
+            </div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec4">
+            <h2>V. Sécurité Financière : La Matrice de Survie</h2>
+            <p>C'est l'erreur numéro 1 des dirigeants : confondre <strong>Rentabilité</strong> (faire du bénéfice, vu au Compte de résultat) et <strong>Solvabilité</strong> (avoir le cash pour payer ses dettes, vu au Bilan).</p>
+
+            <div class="visual-panel">
+                <table style="margin:0;">
+                    <tr style="background:#d1fae5;"><td><strong>Cas 1 : SÉCURITÉ</strong></td><td>Rentable (✅)</td><td>Solvable (✅)</td><td>Pérenne.</td></tr>
+                    <tr style="background:#fef08a;"><td><strong>Cas 2 : RISQUE</strong></td><td>Rentable (✅)</td><td>Non Solvable (❌)</td><td>Panne de cash ! Faillite technique.</td></tr>
+                    <tr style="background:#fed7aa;"><td><strong>Cas 3 : RISQUE</strong></td><td>Non Rentable (❌)</td><td>Solvable (✅)</td><td>Survie sur les réserves passées.</td></tr>
+                    <tr style="background:#fee2e2;"><td><strong>Cas 4 : DANGER</strong></td><td>Non Rentable (❌)</td><td>Non Solvable (❌)</td><td>Crash imminent.</td></tr>
+                </table>
+            </div>
+
+            <p><strong>Le Fonds de Roulement (FR) :</strong> C'est le socle de sécurité ! (<em>FR = Capitaux permanents - Actif immobilisé</em>). Un FR positif prouve que vos ressources longues financent bien vos investissements longs.</p>
+
+            <div class="exercise-box">
+                <span class="exercise-title">🎯 Cas Clinique : L'Auberge Pleine</span>
+                <p>L'Auberge du Grand Monarque est rentable sur le papier (bons bénéfices). Mais son Compte 411 (Créances Clients) est énorme car aucune entreprise n'a encore payé ses banquets du mois dernier. La banque bloque la carte bleue du gérant. Quel est le diagnostic exact ?</p>
+                <select id="q4_select">
+                    <option value="">-- Sélectionnez le diagnostic --</option>
+                    <option value="cas1">Cas 1 : Sécurité, tout va bien.</option>
+                    <option value="cas2">Cas 2 : Risque (Rentable mais Non Solvable, le cash est bloqué chez les clients).</option>
+                    <option value="cas4">Cas 4 : Danger (L'entreprise ne gagne pas d'argent).</option>
+                </select>
+                <br>
+                <button class="btn" onclick="checkMatrice()">Émettre le diagnostic</button>
+                <div class="feedback" id="fb4"></div>
+            </div>
+        </div>
+
+        <!-- -->
+        <div class="content-section" id="sec5">
+            <h2>L'Évaluation du Pilote 📋</h2>
+            <p>Validez votre compréhension des flux financiers pour obtenir votre qualification.</p>
+
+            <div class="exercise-box" style="background-color: #f8fafc; border-color: #0f172a;">
+                <span class="exercise-title" style="color: #0f172a;">📝 QCM de Survie (10 questions)</span>
+                
+                <div class="qcm-question"><p>1. Dans l'analogie de pilotage, quel cadran mesure la Rentabilité ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm1" value="A"> <label>La jauge de carburant.</label> <input type="radio" name="qcm1" value="B"> <label>L'altimètre.</label></div>
+                </div>
+                <div class="qcm-question"><p>2. Le restaurateur possède un ADN financier de type :</p>
+                    <div class="radio-group"><input type="radio" name="qcm2" value="A"> <label>Mixte (Prestataire de services ET Transformateur avec stock périssable).</label> <input type="radio" name="qcm2" value="B"> <label>Négoce pur sans aucune transformation.</label></div>
+                </div>
+                <div class="qcm-question"><p>3. La condition absolue pour que le "moteur" (cycle d'exploitation) génère de la marge est :</p>
+                    <div class="radio-group"><input type="radio" name="qcm3" value="A"> <label>Ventes > Achats.</label> <input type="radio" name="qcm3" value="B"> <label>Achats > Ventes.</label></div>
+                </div>
+                <div class="qcm-question"><p>4. Dans le Bilan, l'Actif représente :</p>
+                    <div class="radio-group"><input type="radio" name="qcm4" value="A"> <label>Ce que l'entreprise DOIT.</label> <input type="radio" name="qcm4" value="B"> <label>Ce que l'entreprise POSSÈDE.</label></div>
+                </div>
+                <div class="qcm-question"><p>5. L'Actif est classé du haut vers le bas par ordre de :</p>
+                    <div class="radio-group"><input type="radio" name="qcm5" value="A"> <label>Liquidité croissante (du plus difficile à vendre au cash pur).</label> <input type="radio" name="qcm5" value="B"> <label>Exigibilité croissante.</label></div>
+                </div>
+                <div class="qcm-question"><p>6. Une facture client en attente de paiement est une :</p>
+                    <div class="radio-group"><input type="radio" name="qcm6" value="A"> <label>Dette Fournisseur (401).</label> <input type="radio" name="qcm6" value="B"> <label>Créance Client (411).</label></div>
+                </div>
+                <div class="qcm-question"><p>7. La Solvabilité mesure la capacité à :</p>
+                    <div class="radio-group"><input type="radio" name="qcm7" value="A"> <label>Générer du bénéfice sur le papier.</label> <input type="radio" name="qcm7" value="B"> <label>Avoir la trésorerie nécessaire pour payer ses dettes.</label></div>
+                </div>
+                <div class="qcm-question"><p>8. Une entreprise rentable mais avec une trésorerie vide est en situation de :</p>
+                    <div class="radio-group"><input type="radio" name="qcm8" value="A"> <label>Cas 2 (Risque de faillite technique).</label> <input type="radio" name="qcm8" value="B"> <label>Cas 1 (Sécurité totale).</label></div>
+                </div>
+                <div class="qcm-question"><p>9. La formule du Fonds de Roulement (FR) est :</p>
+                    <div class="radio-group"><input type="radio" name="qcm9" value="A"> <label>Trésorerie - Créances Clients.</label> <input type="radio" name="qcm9" value="B"> <label>Capitaux permanents - Actif immobilisé.</label></div>
+                </div>
+                <div class="qcm-question"><p>10. Que représente un amortissement en comptabilité ?</p>
+                    <div class="radio-group"><input type="radio" name="qcm10" value="A"> <label>Une rentrée d'argent inattendue.</label> <input type="radio" name="qcm10" value="B"> <label>La répartition de la perte de valeur d'une immobilisation sur sa durée de vie.</label></div>
+                </div>
+
+                <button class="btn" style="background: var(--primary); color: white;" onclick="checkGrandQCM()">Valider le Brevet</button>
+                <div class="feedback" id="fb_qcm"></div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-nav" id="btnPrev" onclick="changeSection(-1)" style="visibility: hidden;">◀ Revoir la théorie</button>
+            <button class="btn-nav" id="btnNext" onclick="changeSection(1)">Suivant ▶</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let originalSections = [];
+    let isTyping = false;
+    let skipTyping = false;
+    let currentIdx = 0;
+    let globalTypeCounter = 0;
+    const totalSections = 6; 
+
+    document.addEventListener("DOMContentLoaded", () => {
+        for (let i = 0; i < totalSections; i++) {
+            const sec = document.getElementById(`sec${i}`);
+            if(sec) {
+                originalSections[i] = sec.cloneNode(true);
+                sec.innerHTML = ''; 
+                sec.classList.remove('active');
+            }
+        }
+    });
+
+    function startCourse() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-interface').style.display = 'block';
+        playSound('nav');
+        showSection(0);
+    }
+
+    function playSound(type) {
+        if (!audioCtx || audioCtx.state === 'suspended') return;
+        const now = audioCtx.currentTime;
+        if (type === 'nav') {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'success' || type === 'fanfare') {
+            const notes = type === 'success' ? [440, 554.37, 659.25, 880] : [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'triangle'; osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, now + i * 0.1); gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.02);
+                gain.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.2);
+                osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.2);
+            });
+        } else if (type === 'error') {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        }
+    }
+
+    let lastTick = 0;
+    function playTick() {
+        if (!audioCtx || audioCtx.state === 'suspended') return;
+        const now = audioCtx.currentTime;
+        if (now - lastTick < 0.03) return; 
+        lastTick = now;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(600 + Math.random() * 200, now); 
+        gain.gain.setValueAtTime(0.015, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+        osc.start(now); osc.stop(now + 0.02);
+    }
+
+    async function typeNode(node, container, counter) {
+        if (counter !== globalTypeCounter) return;
+        if (skipTyping) { container.appendChild(node.cloneNode(true)); return; }
+
+        if (node.nodeType === 1) { 
+            if (node.classList && (node.classList.contains('visual-panel') || node.classList.contains('exercise-box') || node.tagName === 'TABLE')) {
+                container.appendChild(node.cloneNode(true)); return;
+            }
+            const clone = node.cloneNode(false);
+            container.appendChild(clone);
+            for (let child of Array.from(node.childNodes)) { await typeNode(child, clone, counter); }
+        } else if (node.nodeType === 3) { 
+            const text = node.nodeValue;
+            if (!text.trim()) { container.appendChild(document.createTextNode(text)); return; }
+            let textNode = document.createTextNode('');
+            container.appendChild(textNode);
+            const charArray = Array.from(text); 
+            let i = 0; const charsPerFrame = 3; 
+            while(i < charArray.length) {
+                if (counter !== globalTypeCounter) return;
+                if (skipTyping) { textNode.nodeValue = text; break; }
+                let chunk = '';
+                for(let j=0; j < charsPerFrame && i < charArray.length; j++, i++) chunk += charArray[i];
+                textNode.nodeValue += chunk;
+                if (i % 6 === 0) playTick();
+                await new Promise(r => requestAnimationFrame(r));
+            }
+        }
+    }
+
+    async function showSection(idx) {
+        if (idx < 0 || idx >= totalSections) return;
+        globalTypeCounter++; const currentCounter = globalTypeCounter;
+        if(document.getElementById(`sec${currentIdx}`)) document.getElementById(`sec${currentIdx}`).classList.remove('active');
+        document.querySelectorAll('.progress-step')[currentIdx]?.classList.remove('active');
+        currentIdx = idx;
+        const targetSec = document.getElementById(`sec${currentIdx}`);
+        targetSec.classList.add('active');
+        document.querySelectorAll('.progress-step')[currentIdx].classList.add('active');
+        document.getElementById('btnPrev').style.visibility = (currentIdx === 0) ? 'hidden' : 'visible';
+        targetSec.innerHTML = ''; skipTyping = false; isTyping = true;
+        updateNextButton();
+
+        for (let child of Array.from(originalSections[idx].childNodes)) {
+            if (currentCounter !== globalTypeCounter) return;
+            if (skipTyping) targetSec.appendChild(child.cloneNode(true));
+            else await typeNode(child, targetSec, currentCounter);
+        }
+        if (currentCounter === globalTypeCounter) { isTyping = false; updateNextButton(); }
+    }
+
+    function updateNextButton() {
+        const btn = document.getElementById('btnNext');
+        if (isTyping) { btn.innerText = "Accélérer ⏩"; btn.classList.add('skip-mode'); } 
+        else { btn.innerText = (currentIdx === totalSections - 1) ? "Terminer la mission 🏁" : "Suivant ▶"; btn.classList.remove('skip-mode'); }
+    }
+
+    function handleStepClick(idx) {
+        playSound('nav');
+        if (isTyping && idx === currentIdx) { skipTyping = true; return; }
+        showSection(idx);
+    }
+
+    function changeSection(direction) {
+        playSound('nav');
+        if (isTyping && direction > 0) { skipTyping = true; return; }
+        let target = currentIdx + direction;
+        if (target >= 0 && target < totalSections) { showSection(target); window.scrollTo(0, 0); }
+    }
+
+    function checkIntro() {
+        const val = document.getElementById('q0_select').value;
+        const fb = document.getElementById('fb0');
+        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Sélectionnez le cadran en panne !"; return; }
+
+        if (val === "treso") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 C'EST EXACT ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>C'est l'indicateur le plus critique à court terme. Même si votre restaurant est rentable (altimètre au beau fixe), si la Jauge de Trésorerie (le carburant liquide) est vide, les salaires ne passent pas et c'est le crash immédiat.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Faux ! Votre établissement est plein (donc potentiellement rentable). S'il n'y a plus d'argent *immédiatement* disponible pour payer, c'est la Jauge (Trésorerie) qui est vide !";
+        }
+    }
+
+    function checkADN() {
+        const choice = document.querySelector('input[name="q1"]:checked');
+        const fb = document.getElementById('fb1');
+        if (!choice) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Quel est votre profil d'ADN ?"; return; }
+
+        if (choice.value === "hybride") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 PROFIL DÉTECTÉ ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>Le restaurateur est un profil lourd : il doit maîtriser les relations humaines d'un prestataire de service (le service en salle) TOUT en subissant les risques d'une entreprise de production (transformation d'une matière première *périssable*).</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Trop réducteur ! Vous ne faites pas QUE servir (vous cuisinez), et vous ne faites pas QUE revendre en l'état (ce n'est pas du Négoce). Vous êtes un Hybride !";
+        }
+    }
+
+    function checkCycle() {
+        const val = document.getElementById('q2_select').value;
+        const fb = document.getElementById('fb2');
+        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Trouvez l'élément de jonction !"; return; }
+
+        if (val === "treso") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 VRAI ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>Le cycle d'exploitation ne tourne que si l'entreprise dispose du « carburant » (la trésorerie) pour faire la jonction (le pont) entre le moment où elle paie ses charges et celui où elle encaisse enfin ses ventes.</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Erreur ! Le bénéfice n'est qu'un chiffre sur papier. Ce qui fait le pont physique entre vos dépenses et vos recettes, c'est votre réserve d'argent liquide : la Trésorerie.";
+        }
+    }
+
+    function checkBilan() {
+        const choice = document.querySelector('input[name="q3"]:checked');
+        const fb = document.getElementById('fb3');
+        if (!choice) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Où se classe cette dette ?"; return; }
+
+        if (choice.value === "401") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 CLASSEMENT PARFAIT ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>C'est une dette envers un tiers (ce que vous DEVEZ). Elle va donc au Passif. Comme c'est un achat de marchandises, c'est spécifiquement le compte 401 (Dettes Fournisseurs), une dette très exigible (urgente).</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Mauvais tiroir ! Vous DEVEZ de l'argent, c'est donc au Passif. Et ce n'est pas un emprunt sur 10 ans à la banque (16), c'est une dette fournisseur (401) à payer vite !";
+        }
+    }
+
+    function checkMatrice() {
+        const val = document.getElementById('q4_select').value;
+        const fb = document.getElementById('fb4');
+        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Quel est le diagnostic du médecin financier ?"; return; }
+
+        if (val === "cas2") {
+            playSound('success'); fb.className = "feedback success";
+            fb.innerHTML = "🎯 DIAGNOSTIC VALIDÉ ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>Cas d'école du 'Cas 2 : Risque'. L'entreprise est très rentable (le moteur marche), mais comme les clients n'ont pas encore payé (Créances 411 gonflées), la trésorerie est vide. C'est l'insolvabilité et la faillite technique imminente si l'argent ne rentre pas !</div>";
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Erreur de lecture ! L'auberge gagne de l'argent sur le papier (Rentabilité = OK). Mais elle n'a pas de cash (Solvabilité = NON). C'est le Cas 2, le risque absolu de la faillite technique !";
+        }
+    }
+
+    function checkGrandQCM() {
+        const correctAnswers = ['B', 'A', 'A', 'B', 'A', 'B', 'B', 'A', 'B', 'B'];
+        let score = 0, missing = false;
+
+        for (let i = 1; i <= 10; i++) {
+            const choice = document.querySelector(`input[name="qcm${i}"]:checked`);
+            if (!choice) { missing = true; break; }
+            if (choice.value === correctAnswers[i-1]) score++;
+        }
+
+        const fb = document.getElementById('fb_qcm');
+        if (missing) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Répondez aux 10 questions de survie pour atterrir !"; return; }
+
+        if (score >= 8) {
+            playSound('fanfare'); fb.className = "feedback success";
+            fb.innerHTML = `🏆 BREVET DE PILOTE VALIDÉ ! Score : ${score}/10. Vous maîtrisez les flux de base ! <div class='critic-block'><div class='critic-title'>🔍 Bilan Certifié :</div>Vous avez parfaitement intégré que la rentabilité ne suffit pas, et que la trésorerie est le nerf de la guerre. Les concepts d'Actif/Passif et de FR sont acquis.</div>`;
+        } else if (score >= 5) {
+            playSound('success'); fb.className = "feedback success"; fb.innerHTML = `✅ ATTERRISSAGE CORRECT. Score : ${score}/10. L'avion est au sol, mais attention aux turbulences, révisez bien la classification du Bilan.`;
+        } else {
+            playSound('error'); fb.className = "feedback error"; fb.innerHTML = `❌ CRASH. Score : ${score}/10. L'entreprise est en cessation de paiements. Il faut impérativement repasser au simulateur de vol !`;
+        }
+    }
+</script>
+
+</body>
+</html>
