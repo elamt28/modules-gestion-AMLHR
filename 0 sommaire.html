@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Formation : Gestion Financière AMLHR</title>
+    <style>
+        :root {
+            --primary: #0f172a; 
+            --secondary: #3b82f6; 
+            --accent: #f59e0b; 
+            --light: #f8fafc;
+            --dark: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Impact', sans-serif;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border: 4px solid var(--dark);
+            border-radius: 20px;
+            box-shadow: 8px 8px 0px var(--dark);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--secondary);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--dark);
+            color: white;
+            position: relative;
+            background-image: radial-gradient(circle at top right, #60a5fa 0%, #2563eb 100%);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32pt;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px var(--dark);
+        }
+
+        header p {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #eff6ff;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f1f5f9;
+        }
+
+        .module-card {
+            background: white;
+            border: 3px solid var(--dark);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--dark);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .module-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 7px 7px 0px var(--dark);
+            background: #fef3c7;
+        }
+        
+        .module-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--dark);
+        }
+
+        .module-number {
+            background: var(--dark);
+            color: white;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14pt;
+            margin-bottom: 10px;
+            border: 2px solid white;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+        }
+
+        .module-title {
+            font-size: 16pt;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .module-desc {
+            font-size: 11pt;
+            color: #475569;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .btn-launch {
+            background: var(--accent);
+            color: var(--dark);
+            border: 2px solid var(--dark);
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        .card-synthesis {
+            background: #fffbeb;
+            border-color: #b45309;
+        }
+        .card-synthesis .module-title { color: #d97706; }
+        .card-synthesis .btn-launch { background: #d97706; color: white; }
+        
+        .card-synthesis:hover {
+            background: #fef08a;
+            border-color: var(--dark);
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <h1>Académie AMLHR</h1>
+            <p>Le Hub Central de la Gestion Financière - CFA Interpro</p>
+        </header>
+
+        <div class="modules-grid">
+            
+            <a href="chrono_gestion_amlhr.html" class="module-card">
+                <div class="module-number">1</div>
+                <div class="module-title">Les Bases Financières</div>
+                <div class="module-desc">Découvrez l'ADN de l'entreprise, les flux économiques et l'introduction à la rentabilité et la solvabilité.</div>
+                <div class="btn-launch">Lancer 🛫</div>
+            </a>
+
+            <a href="Chrono-Gestion-Compte-Resultat.html" class="module-card">
+                <div class="module-number">2</div>
+                <div class="module-title">Le Compte de Résultat</div>
+                <div class="module-desc">Le moteur économique : analysez les charges, les produits et la formation du bénéfice de l'année.</div>
+                <div class="btn-launch">Lancer ⚙️</div>
+            </a>
+
+            <a href="Chrono-Gestion-SIG.html" class="module-card">
+                <div class="module-number">3</div>
+                <div class="module-title">Les SIG</div>
+                <div class="module-desc">L'altimètre de précision : décortiquez la rentabilité via la Marge, la Valeur Ajoutée et l'EBE.</div>
+                <div class="btn-launch">Lancer 📉</div>
+            </a>
+
+            <a href="Chrono-Gestion-CAF.html" class="module-card">
+                <div class="module-number">4</div>
+                <div class="module-title">La CAF</div>
+                <div class="module-desc">La batterie interne : calculez la Capacité d'Autofinancement, la vraie richesse générée par l'exploitation.</div>
+                <div class="btn-launch">Lancer 🔋</div>
+            </a>
+
+            <a href="Chrono-Gestion-Bilan-Fonctionnel.html" class="module-card">
+                <div class="module-number">5</div>
+                <div class="module-title">Le Bilan Fonctionnel</div>
+                <div class="module-desc">L'IRM de l'entreprise : analysez l'équilibre financier à travers le Fonds de Roulement (FR) et le BFR.</div>
+                <div class="btn-launch">Lancer 🩺</div>
+            </a>
+
+            <a href="Chrono-Gestion-Investissement.html" class="module-card">
+                <div class="module-number">6</div>
+                <div class="module-title">L'Investissement</div>
+                <div class="module-desc">La boussole stratégique : apprenez à financer le développement sans assécher la trésorerie.</div>
+                <div class="btn-launch">Lancer 🏗️</div>
+            </a>
+
+            <a href="Chrono-Gestion-Flux-Financiers.html" class="module-card">
+                <div class="module-number">7</div>
+                <div class="module-title">Les Flux Financiers</div>
+                <div class="module-desc">Vol au-dessus des flux : maîtrisez la matrice de survie et la jonction entre le bilan et le résultat.</div>
+                <div class="btn-launch">Lancer 🛩️</div>
+            </a>
+
+            <a href="Chrono-Gestion-Synthese-Financiere.html" class="module-card card-synthesis">
+                <div class="module-number" style="background: #b45309;">8</div>
+                <div class="module-title">Synthèse Globale</div>
+                <div class="module-desc">L'épreuve finale : reliez tous les concepts dans un grand tableau de bord d'expertise pour valider vos acquis.</div>
+                <div class="btn-launch">Lancer l'Expertise 🏆</div>
+            </a>
+
+        </div>
+
+        <footer>
+            <p>Créé pour les étudiants du CFA Interpro de Chartres | Module Open-Source</p>
+        </footer>
+    </div>
+
+</body>
+</html>
