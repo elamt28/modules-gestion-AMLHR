@@ -189,6 +189,50 @@
         }
     }
 </script>
+<style>
+    /* Effet Machine à écrire sur les titres des missions */
+    .scenario-box h3 {
+        display: inline-block;
+        overflow: hidden;
+        border-right: .15em solid var(--primary);
+        white-space: nowrap;
+        margin: 0;
+        animation: typing 2.5s steps(40, end), blink-caret .75s step-end infinite;
+    }
+    
+    /* Adaptabilité pour les petits écrans (Pixel 9, etc.) */
+    @media (max-width: 600px) {
+        .scenario-box h3 { white-space: normal; border-right: none; animation: none; }
+    }
 
+    @keyframes typing { from { width: 0 } to { width: 100% } }
+    @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
+</style>
+
+<script>
+    // Synthétiseur sonore certifié (génère un "Bip" doux sans fichier audio externe)
+    function playBip() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'triangle'; // Son doux et agréable
+            osc.frequency.setValueAtTime(600, ctx.currentTime); 
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
+            osc.stop(ctx.currentTime + 0.3);
+        } catch(e) {
+            console.log("Audio non supporté");
+        }
+    }
+
+    // Activation du son sur TOUS les boutons et liens de navigation de l'application
+    document.querySelectorAll('button, .nav-btn, .item-to-sort, .item-btn, .menu-card').forEach(btn => {
+        btn.addEventListener('click', playBip);
+    });
+</script>
 </body>
 </html>
