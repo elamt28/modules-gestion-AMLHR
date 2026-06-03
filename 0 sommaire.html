@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hub de Formation : Gestion Financière AMLHR</title>
+    <title>Table des Matières - CFA Interpro</title>
     <style>
         :root {
             --primary: #0f172a; 
@@ -13,221 +13,140 @@
             --dark: #020617;
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Comic Sans MS', 'Impact', sans-serif;
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', sans-serif; }
+        body { background-color: #e2e8f0; color: var(--dark); padding: 20px; display: flex; justify-content: center; }
+        
+        .app-container { 
+            width: 100%; 
+            max-width: 900px; 
+            background: white; 
+            border: 4px solid var(--dark); 
+            border-radius: 20px; 
+            box-shadow: 8px 8px 0 var(--dark); 
+            overflow: hidden; 
         }
 
-        body {
-            background-color: #e2e8f0;
-            color: var(--primary);
-            margin: 0;
-            padding: 20px;
+        header { 
+            background: var(--primary); 
+            padding: 30px 20px; 
+            text-align: center; 
+            border-bottom: 4px solid var(--dark); 
+        }
+        
+        header h1 { color: white; text-shadow: 2px 2px 0 var(--secondary); margin: 0; font-size: 2.5em; text-transform: uppercase; }
+        header p { color: #cbd5e1; font-size: 1.2em; margin-top: 10px; font-weight: bold; }
+
+        .content-section { padding: 40px; }
+        
+        h2 { color: var(--secondary); font-size: 1.8em; text-align: center; margin-bottom: 30px; border-bottom: 3px dashed var(--secondary); padding-bottom: 10px; }
+
+        .grid-menu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .menu-card {
             display: flex;
-            justify-content: center;
-        }
-
-        .dashboard-container {
-            max-width: 1100px;
-            width: 100%;
-            background: white;
-            border: 4px solid var(--dark);
-            border-radius: 20px;
-            box-shadow: 8px 8px 0px var(--dark);
-            overflow: hidden;
-        }
-
-        header {
-            background: var(--secondary);
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 4px solid var(--dark);
-            color: white;
-            position: relative;
-            background-image: radial-gradient(circle at top right, #60a5fa 0%, #2563eb 100%);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 32pt;
-            text-transform: uppercase;
-            text-shadow: 3px 3px 0px var(--dark);
-        }
-
-        header p {
-            font-size: 14pt;
-            font-weight: bold;
-            margin-top: 10px;
-            color: #eff6ff;
-        }
-
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f1f5f9;
-        }
-
-        .module-card {
-            background: white;
+            align-items: center;
+            background: var(--light);
             border: 3px solid var(--dark);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 4px 4px 0px var(--dark);
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             text-decoration: none;
-            color: inherit;
+            color: var(--dark);
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 var(--dark);
         }
 
-        .module-card:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 7px 7px 0px var(--dark);
-            background: #fef3c7;
+        .menu-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--secondary);
+            background: #eff6ff;
         }
-        
-        .module-card:active {
+
+        .menu-card:active {
             transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px var(--dark);
+            box-shadow: 0px 0px 0 var(--dark);
         }
 
-        .module-number {
-            background: var(--dark);
-            color: white;
-            width: 35px;
-            height: 35px;
+        .icon-container {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border: 2px solid var(--dark);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 14pt;
-            margin-bottom: 10px;
-            border: 2px solid white;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            margin-right: 15px;
+            font-size: 1.2em;
+            flex-shrink: 0;
         }
-
-        .module-title {
-            font-size: 16pt;
-            font-weight: bold;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-
-        .module-desc {
-            font-size: 11pt;
-            color: #475569;
-            flex-grow: 1;
-            margin-bottom: 15px;
-        }
-
-        .btn-launch {
-            background: var(--accent);
-            color: var(--dark);
-            border: 2px solid var(--dark);
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 8px;
-            text-transform: uppercase;
-        }
-
-        .card-synthesis {
-            background: #fffbeb;
-            border-color: #b45309;
-        }
-        .card-synthesis .module-title { color: #d97706; }
-        .card-synthesis .btn-launch { background: #d97706; color: white; }
         
-        .card-synthesis:hover {
-            background: #fef08a;
-            border-color: var(--dark);
-        }
-
-        footer {
-            background: var(--dark);
-            color: white;
+        .footer-logo {
             text-align: center;
-            padding: 15px;
-            font-size: 10pt;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <header>
-            <h1>Académie AMLHR</h1>
-            <p>Le Hub Central de la Gestion Financière - CFA Interpro</p>
-        </header>
+<div class="app-container">
+    <header>
+        <h1>Plan de Vol Financier 🛩️</h1>
+        <p>— Table des Matières AMLHR —</p>
+    </header>
 
-        <div class="modules-grid">
-            
-            <a href="chrono_gestion_amlhr.html" class="module-card">
-                <div class="module-number">1</div>
-                <div class="module-title">Les Bases Financières</div>
-                <div class="module-desc">Découvrez l'ADN de l'entreprise, les flux économiques et l'introduction à la rentabilité et la solvabilité.</div>
-                <div class="btn-launch">Lancer 🛫</div>
+    <div class="content-section">
+        <h2>Sélectionnez votre module</h2>
+        
+        <div class="grid-menu">
+            <a href="1 intro.html" class="menu-card">
+                <div class="icon-container">1</div>
+                Introduction
             </a>
-
-            <a href="Chrono-Gestion-Compte-Resultat.html" class="module-card">
-                <div class="module-number">2</div>
-                <div class="module-title">Le Compte de Résultat</div>
-                <div class="module-desc">Le moteur économique : analysez les charges, les produits et la formation du bénéfice de l'année.</div>
-                <div class="btn-launch">Lancer ⚙️</div>
+            <a href="2 Le bilan.html" class="menu-card">
+                <div class="icon-container">2</div>
+                Le Bilan
             </a>
-
-            <a href="Chrono-Gestion-SIG.html" class="module-card">
-                <div class="module-number">3</div>
-                <div class="module-title">Les SIG</div>
-                <div class="module-desc">L'altimètre de précision : décortiquez la rentabilité via la Marge, la Valeur Ajoutée et l'EBE.</div>
-                <div class="btn-launch">Lancer 📉</div>
+            <a href="3 Le bilan fonctionnel.html" class="menu-card">
+                <div class="icon-container">3</div>
+                Le Bilan Fonctionnel
             </a>
-
-            <a href="Chrono-Gestion-CAF.html" class="module-card">
-                <div class="module-number">4</div>
-                <div class="module-title">La CAF</div>
-                <div class="module-desc">La batterie interne : calculez la Capacité d'Autofinancement, la vraie richesse générée par l'exploitation.</div>
-                <div class="btn-launch">Lancer 🔋</div>
+            <a href="4 Le compte de résultat.html" class="menu-card">
+                <div class="icon-container">4</div>
+                Le Compte de Résultat
             </a>
-
-            <a href="Chrono-Gestion-Bilan-Fonctionnel.html" class="module-card">
-                <div class="module-number">5</div>
-                <div class="module-title">Le Bilan Fonctionnel</div>
-                <div class="module-desc">L'IRM de l'entreprise : analysez l'équilibre financier à travers le Fonds de Roulement (FR) et le BFR.</div>
-                <div class="btn-launch">Lancer 🩺</div>
+            <a href="5 Les SIG.html" class="menu-card">
+                <div class="icon-container">5</div>
+                Les SIG
             </a>
-
-            <a href="Chrono-Gestion-Investissement.html" class="module-card">
-                <div class="module-number">6</div>
-                <div class="module-title">L'Investissement</div>
-                <div class="module-desc">La boussole stratégique : apprenez à financer le développement sans assécher la trésorerie.</div>
-                <div class="btn-launch">Lancer 🏗️</div>
+            <a href="6 La CAF.html" class="menu-card">
+                <div class="icon-container">6</div>
+                La CAF
             </a>
-
-            <a href="Chrono-Gestion-Flux-Financiers.html" class="module-card">
-                <div class="module-number">7</div>
-                <div class="module-title">Les Flux Financiers</div>
-                <div class="module-desc">Vol au-dessus des flux : maîtrisez la matrice de survie et la jonction entre le bilan et le résultat.</div>
-                <div class="btn-launch">Lancer 🛩️</div>
+            <a href="7 Le pilotage des flux financier.html" class="menu-card">
+                <div class="icon-container">7</div>
+                Le Pilotage des Flux Financiers
             </a>
-
-            <a href="Chrono-Gestion-Synthese-Financiere.html" class="module-card card-synthesis">
-                <div class="module-number" style="background: #b45309;">8</div>
-                <div class="module-title">Synthèse Globale</div>
-                <div class="module-desc">L'épreuve finale : reliez tous les concepts dans un grand tableau de bord d'expertise pour valider vos acquis.</div>
-                <div class="btn-launch">Lancer l'Expertise 🏆</div>
+            <a href="8 Le financement des investissements.html" class="menu-card">
+                <div class="icon-container">8</div>
+                Le Financement des Investissements
             </a>
-
         </div>
-
-        <footer>
-            <p>Créé pour les étudiants du CFA Interpro de Chartres | Module Open-Source</p>
-        </footer>
+        
+        <div class="footer-logo">
+            <svg width="80" height="80" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#f8fafc" stroke="#0f172a" stroke-width="4"/>
+                <path d="M 30 50 L 70 50 M 50 30 L 50 70" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="10" fill="#3b82f6" stroke="#0f172a" stroke-width="3"/>
+            </svg>
+        </div>
     </div>
+</div>
 
 </body>
 </html>
