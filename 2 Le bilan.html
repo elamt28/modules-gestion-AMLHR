@@ -151,10 +151,18 @@
 
     @keyframes typing { from { width: 0 } to { width: 100% } }
     @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
+<style>
+    /* Curseur clignotant de machine à écrire */
+    .typing-cursor::after {
+        content: '|';
+        animation: blink 1s step-end infinite;
+        color: var(--primary);
+    }
+    @keyframes blink { 50% { opacity: 0; } }
 </style>
 
 <script>
-    // Synthétiseur sonore certifié (génère un "Bip" doux sans fichier audio externe)
+    // 1. Synthétiseur sonore certifié
     function playBip() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -162,21 +170,58 @@
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
-            osc.type = 'triangle'; // Son doux et agréable
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(600, ctx.currentTime); 
             gain.gain.setValueAtTime(0.1, ctx.currentTime);
             osc.start();
             gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
             osc.stop(ctx.currentTime + 0.3);
-        } catch(e) {
-            console.log("Audio non supporté");
-        }
+        } catch(e) {}
     }
 
-    // Activation du son sur TOUS les boutons et liens de navigation de l'application
+    // Ajout du son sur tous les éléments interactifs
     document.querySelectorAll('button, .nav-btn, .item-to-sort, .item-btn, .menu-card').forEach(btn => {
         btn.addEventListener('click', playBip);
     });
+
+    // 2. Moteur Machine à écrire multilinge (Sécurité anti-débordement)
+    function typeWriterEffect(elements, speed) {
+        elements.forEach(el => {
+            const text = el.innerHTML;
+            el.innerHTML = ''; // On vide le texte initial
+            el.classList.add('typing-cursor');
+            let i = 0;
+            
+            // Délai de 500ms pour laisser la page charger avant de taper
+            setTimeout(() => {
+                const typing = setInterval(() => {
+                    if (i < text.length) {
+                        // Gestion intelligente des balises HTML (comme les <strong> ou les emojis)
+                        if(text.charAt(i) === '<') {
+                            let tag = '';
+                            while(text.charAt(i) !== '>' && i < text.length) {
+                                tag += text.charAt(i);
+                                i++;
+                            }
+                            tag += '>';
+                            el.innerHTML += tag;
+                        } else {
+                            el.innerHTML += text.charAt(i);
+                        }
+                        i++;
+                    } else {
+                        clearInterval(typing);
+                        el.classList.remove('typing-cursor'); // Enlève le curseur à la fin
+                    }
+                }, speed);
+            }, 500);
+        });
+    }
+
+    // Déploiement de l'effet sur les H1, H2 et H3
+    // (Pédagogiquement, on évite de l'appliquer aux paragraphes entiers pour ne pas ralentir la lecture)
+    const titresAAnimer = document.querySelectorAll('header h1, h2, .scenario-box h3');
+    typeWriterEffect(titresAAnimer, 30); // 30 millisecondes par lettre (vitesse dynamique)
 </script>
 </body>
 </html>
