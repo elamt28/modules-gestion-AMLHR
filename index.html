@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -35,6 +35,7 @@
         
         header h1 { color: white; text-shadow: 2px 2px 0 var(--secondary); margin: 0; font-size: 2.5em; text-transform: uppercase; }
         header p { color: #cbd5e1; font-size: 1.2em; margin-top: 10px; font-weight: bold; }
+        .auteur { color: var(--accent); font-size: 1em; margin-top: 5px; font-style: italic; }
 
         .content-section { padding: 40px; }
         
@@ -90,6 +91,13 @@
             text-align: center;
             margin-top: 40px;
         }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            color: var(--secondary);
+        }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
@@ -98,6 +106,7 @@
     <header>
         <h1>Plan de Vol Financier 🛩️</h1>
         <p>— Table des Matières AMLHR —</p>
+        <div class="auteur">Conçu et dirigé par Emmanuel Boutée</div>
     </header>
 
     <div class="content-section">
@@ -147,28 +156,8 @@
         </div>
     </div>
 </div>
-<style>
-    /* Effet Machine à écrire sur les titres des missions */
-    .scenario-box h3 {
-        display: inline-block;
-        overflow: hidden;
-        border-right: .15em solid var(--primary);
-        white-space: nowrap;
-        margin: 0;
-        animation: typing 2.5s steps(40, end), blink-caret .75s step-end infinite;
-    }
-    
-    /* Adaptabilité pour les petits écrans (Pixel 9, etc.) */
-    @media (max-width: 600px) {
-        .scenario-box h3 { white-space: normal; border-right: none; animation: none; }
-    }
-
-    @keyframes typing { from { width: 0 } to { width: 100% } }
-    @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
-</style>
 
 <script>
-    // Synthétiseur sonore certifié (génère un "Bip" doux sans fichier audio externe)
     function playBip() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -176,21 +165,53 @@
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
-            osc.type = 'triangle'; // Son doux et agréable
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(600, ctx.currentTime); 
             gain.gain.setValueAtTime(0.1, ctx.currentTime);
             osc.start();
             gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
             osc.stop(ctx.currentTime + 0.3);
-        } catch(e) {
-            console.log("Audio non supporté");
-        }
+        } catch(e) {}
     }
 
-    // Activation du son sur TOUS les boutons et liens de navigation de l'application
-    document.querySelectorAll('button, .nav-btn, .item-to-sort, .item-btn, .menu-card').forEach(btn => {
+    document.querySelectorAll('a.menu-card').forEach(btn => {
         btn.addEventListener('click', playBip);
     });
+
+    function typeWriterEffect(elements, speed) {
+        elements.forEach(el => {
+            const text = el.innerHTML;
+            el.innerHTML = '';
+            el.classList.add('typing-cursor');
+            let i = 0;
+            
+            setTimeout(() => {
+                const typing = setInterval(() => {
+                    if (i < text.length) {
+                        if(text.charAt(i) === '<') {
+                            let tag = '';
+                            while(text.charAt(i) !== '>' && i < text.length) {
+                                tag += text.charAt(i);
+                                i++;
+                            }
+                            tag += '>';
+                            el.innerHTML += tag;
+                        } else {
+                            el.innerHTML += text.charAt(i);
+                        }
+                        i++;
+                    } else {
+                        clearInterval(typing);
+                        el.classList.remove('typing-cursor');
+                    }
+                }, speed);
+            }, 500);
+        });
+    }
+
+    const titresAAnimer = document.querySelectorAll('header h1, h2');
+    typeWriterEffect(titresAAnimer, 30);
 </script>
+
 </body>
 </html>
