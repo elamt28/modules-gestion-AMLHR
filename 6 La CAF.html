@@ -3,584 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La CAF - CFA Interpro de Chartres</title>
+    <title>La CAF - Le Pilotage Financier</title>
     <style>
         :root {
-            --primary: #8b5cf6; /* Violet électrique (Énergie/Ressource) */
-            --secondary: #10b981; /* Vert émeraude (Cash/Trésorerie) */
-            --accent: #f59e0b; /* Ambre (Alerte) */
-            --dark: #1e293b;
+            --primary: #14b8a6; /* Bleu canard/Teal pour l'énergie/ressources */
+            --secondary: #0f172a;
+            --accent: #eab308; /* Jaune électrique */
             --light: #f8fafc;
-            --success: #059669;
-            --danger: #dc2626;
+            --danger: #ef4444;
         }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Comic Sans MS', 'Impact', sans-serif;
-        }
-
-        body {
-            background-color: #f5f3ff;
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-            display: block;
-        }
-
-        .app-container {
-            max-width: 950px;
-            margin: 0 auto;
-            background: white;
-            border: 4px solid var(--dark);
-            border-radius: 20px;
-            box-shadow: 8px 8px 0px var(--dark);
-            overflow: hidden;
-            position: relative;
-            min-height: 600px;
-        }
-
-        /* --- STREAMING_CHUNK: Styling the welcome screen and header... --- */
-        #welcome-screen {
-            position: absolute;
-            inset: 0;
-            background: var(--light);
-            z-index: 100;
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', cursive, sans-serif; }
+        body { margin: 0; background-color: #f1f5f9; color: var(--secondary); line-height: 1.6; }
+        
+        .container { max-width: 900px; margin: 20px auto; background: white; border: 4px solid var(--secondary); border-radius: 15px; overflow: hidden; box-shadow: 8px 8px 0px var(--secondary); }
+        
+        header { background: var(--primary); color: white; padding: 30px; text-align: center; border-bottom: 4px solid var(--secondary); }
+        header h1 { margin: 0; font-size: 2.5em; text-shadow: 2px 2px 0px var(--secondary); text-transform: uppercase; }
+        
+        .content { padding: 30px; }
+        
+        .scenario-box { background: #ccfbf1; border: 3px dashed var(--primary); padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; align-items: center; gap: 20px; }
+        
+        .illustration-cartoon {
+            width: 150px;
+            height: 150px;
+            background: #fff;
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 40px;
-            background-image: radial-gradient(circle at center, #ffffff 0%, #ede9fe 100%);
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px var(--accent);
+            position: relative;
         }
+
+        h2 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
         
-        #welcome-screen h1 { color: var(--primary); font-size: 32pt; margin-bottom: 10px; text-shadow: 3px 3px 0px var(--secondary); }
-        #welcome-screen p { font-size: 14pt; color: #475569; margin-bottom: 30px; font-weight: bold;}
+        .battery-station { background: var(--secondary); padding: 30px; border-radius: 15px; color: white; text-align: center; margin: 30px 0; border: 4px solid var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         
-        .btn-start {
-            background: var(--primary); color: white; border: 4px solid var(--dark);
-            padding: 20px 40px; font-size: 18pt; font-weight: bold; border-radius: 12px;
-            cursor: pointer; box-shadow: 6px 6px 0px var(--dark); transition: all 0.2s ease;
-            text-transform: uppercase;
-        }
-        .btn-start:hover { transform: translate(2px, 2px); box-shadow: 4px 4px 0px var(--dark); background: #7c3aed; }
-        .btn-start:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px var(--dark); }
-
-        header {
-            background: var(--primary); padding: 20px; text-align: center; border-bottom: 4px solid var(--dark); position: relative;
-        }
-        header h1 { margin: 0; font-size: 24pt; text-transform: uppercase; letter-spacing: 1px; color: white; text-shadow: 2px 2px 0px var(--dark); }
-        header p { margin: 5px 0 0 0; font-size: 12pt; font-style: italic; font-weight: bold; color: #ede9fe; }
-
-        /* --- STREAMING_CHUNK: Styling the progress bar and content sections... --- */
-        #main-interface { display: none; }
-
-        .progress-bar { display: table; width: 100%; background: #e2e8f0; border-bottom: 4px solid var(--dark); }
-        .progress-step {
-            display: table-cell; text-align: center; padding: 10px 5px; font-size: 9.5pt; font-weight: bold;
-            border-right: 2px solid var(--dark); cursor: pointer; background: #fff; transition: all 0.2s ease;
-        }
-        .progress-step.active { background: var(--secondary); color: white; }
-        .progress-step:last-child { border-right: none; }
-
-        .content-section { padding: 30px; display: none; }
-        .content-section.active { display: block; }
-
-        h2 { color: var(--primary); font-size: 18pt; border-bottom: 3px solid var(--dark); padding-bottom: 5px; margin-top: 0; }
-        h3 { color: var(--dark); font-size: 14pt; background: #d1fae5; display: inline-block; padding: 5px 10px; border: 2px solid var(--dark); transform: rotate(-1deg); margin-bottom: 15px; }
-        p, li { font-size: 11.5pt; line-height: 1.6; }
-
-        /* --- STREAMING_CHUNK: Styling visual panels and interactive elements... --- */
-        .visual-panel {
-            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border: 4px solid var(--dark);
-            border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; box-shadow: 6px 6px 0px var(--dark);
-            display: flex; justify-content: center; gap: 20px; align-items: center; animation: popIn 0.5s ease-out; flex-direction: column;
-        }
+        .battery-container { width: 100px; height: 200px; border: 6px solid white; border-radius: 10px; margin: 20px auto; position: relative; padding: 4px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .battery-top { width: 40px; height: 15px; background: white; border-radius: 5px 5px 0 0; position: absolute; top: -15px; left: 24px; }
+        .battery-level { width: 100%; height: 20%; background: var(--danger); transition: height 0.8s ease, background-color 0.8s ease; border-radius: 4px; }
         
-        .cartoon-svg { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        .cartoon-svg:hover { transform: scale(1.1) rotate(3deg); }
-
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 3px solid var(--dark); box-shadow: 4px 4px 0px var(--dark); }
-        th, td { border: 2px solid var(--dark); padding: 12px; text-align: left; font-size: 10.5pt; }
-        th { background: #ddd6fe; color: var(--dark); font-weight: bold; text-transform: uppercase; }
-        tr:nth-child(even) { background: #f8fafc; }
-
-        .exercise-box {
-            background: #fef3c7; border: 4px solid var(--dark); border-radius: 12px; padding: 20px;
-            margin: 25px 0; box-shadow: 6px 6px 0px var(--dark); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .exercise-title { font-weight: bold; font-size: 13pt; margin-bottom: 10px; color: var(--dark); text-transform: uppercase; display: block; }
-
-        .btn {
-            background: var(--primary); color: white; border: 3px solid var(--dark); padding: 10px 20px;
-            font-size: 11.5pt; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 3px 3px 0px var(--dark); transition: all 0.1s ease; margin-top: 10px;
-        }
-        .btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px var(--dark); background: #6d28d9;}
-        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--dark); }
-
-        .feedback { margin-top: 15px; padding: 15px; border: 3px solid var(--dark); border-radius: 8px; display: none; font-weight: bold; font-size: 11pt; }
-        .feedback.success { background: #d1fae5; color: #065f46; display: block; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .feedback.error { background: #fee2e2; color: #991b1b; display: block; animation: shake 0.4s ease-in-out; }
-
-        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-
-        /* --- STREAMING_CHUNK: Styling UI components (critic blocks, nav buttons, forms)... --- */
-        .critic-block { background: #f0fdf4; border-left: 6px solid #16a34a; padding: 12px; margin-top: 12px; font-size: 10.5pt; border-radius: 0 8px 8px 0; border: 2px solid var(--dark); border-left-width: 6px;}
-        .critic-title { font-weight: bold; color: #15803d; margin-bottom: 6px; font-size: 11pt; }
-
-        .nav-buttons { display: block; padding: 20px 30px; background: #f1f5f9; border-top: 4px solid var(--dark); }
-        .nav-buttons::after { content: ""; clear: both; display: table; }
-        .btn-nav { background: var(--dark); color: white; border: 2px solid var(--dark); padding: 10px 25px; font-size: 11pt; font-weight: bold; border-radius: 8px; cursor: pointer; float: right; transition: all 0.2s; }
-        .btn-nav:first-child { float: left; }
-        .btn-nav.skip-mode { background: var(--accent); color: #000; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
-
-        select, input[type="radio"], input[type="number"] { margin: 8px 0; padding: 8px; font-size: 11pt; border: 2px solid var(--dark); border-radius: 6px; font-weight: bold; cursor: pointer;}
-        .radio-group { margin-bottom: 12px; }
-        .radio-group label { margin-left: 8px; cursor: pointer; }
-        .sound-badge { position: absolute; top: 10px; right: 10px; background: white; border: 3px solid var(--dark); border-radius: 20px; padding: 5px 10px; font-size: 10pt; font-weight: bold; box-shadow: 2px 2px 0 var(--dark); color: var(--dark);}
-
-        .qcm-question { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #94a3b8; }
-        .qcm-question:last-child { border-bottom: none; }
-        .qcm-question p { font-weight: bold; margin-bottom: 8px; color: #0f172a;}
+        .formula-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-family: monospace; font-size: 1.2em; }
         
-        .formula-box { background: white; padding: 15px; border: 3px dashed var(--secondary); text-align: center; font-size: 14pt; font-weight: bold; border-radius: 10px; margin: 15px 0; color: var(--primary);}
+        .charge-btn { background: var(--accent); color: var(--secondary); border: 3px solid white; padding: 12px 25px; font-size: 1.2em; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; margin: 5px; }
+        .charge-btn:hover { background: white; transform: scale(1.05); }
+        .charge-btn:disabled { background: #64748b; cursor: not-allowed; transform: none; border-color: #94a3b8; }
+
+        .navigation-bar { display: flex; justify-content: space-between; padding: 20px; background: var(--secondary); border-top: 4px solid var(--primary); flex-wrap: wrap; gap: 10px;}
+        .nav-btn { background: var(--accent); color: var(--secondary); text-decoration: none; padding: 12px 20px; border: 3px solid var(--secondary); border-radius: 8px; font-weight: bold; font-size: 1.1em; transition: all 0.2s; text-align: center; flex: 1; min-width: 150px;}
+        .nav-btn:hover { background: white; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="container">
+    <header>
+        <h1>La CAF 🔋</h1>
+        <p>L'alternateur de votre entreprise</p>
+    </header>
 
-    <div id="welcome-screen">
-        <!-- SVG Batterie Cartoon -->
-        <svg class="cartoon-svg" width="140" height="140" viewBox="0 0 140 140" style="margin-bottom: 20px;">
-            <rect x="30" y="40" width="80" height="90" rx="10" fill="#f8fafc" stroke="#1e293b" stroke-width="6"/>
-            <rect x="50" y="25" width="40" height="15" rx="5" fill="#1e293b"/>
-            <!-- Jauge d'énergie verte -->
-            <rect x="40" y="100" width="60" height="20" rx="3" fill="#10b981" stroke="#1e293b" stroke-width="3"/>
-            <rect x="40" y="75" width="60" height="20" rx="3" fill="#10b981" stroke="#1e293b" stroke-width="3"/>
-            <rect x="40" y="50" width="60" height="20" rx="3" fill="#10b981" stroke="#1e293b" stroke-width="3"/>
-            <!-- Éclair -->
-            <path d="M 75 45 L 55 80 L 70 80 L 65 115 L 85 75 L 70 75 Z" fill="#f59e0b" stroke="#1e293b" stroke-width="3"/>
-        </svg>
-        <h1>⚡ La Batterie Interne</h1>
-        <p>Découvrez la CAF : la capacité de votre entreprise à générer sa propre énergie vitale.</p>
-        <button class="btn-start" onclick="startCourse()">Brancher les câbles</button>
+    <div class="content">
+        <div class="scenario-box">
+            <div class="illustration-cartoon">
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                    <circle cx="50" cy="50" r="45" fill="#eab308" stroke="#0f172a" stroke-width="4"/>
+                    <path d="M 55 15 L 30 55 L 50 55 L 45 85 L 75 45 L 50 45 Z" fill="#fff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Mission 6 : Recharger les batteries</h3>
+                <p>Dans la leçon précédente, notre crêperie <strong>"Marche ou Crêpes"</strong> a dégagé un bel EBE (Excédent Brut d'Exploitation). C'est parfait ! Mais l'EBE ne tient pas compte de l'argent que vous devez donner à la banque (les intérêts de l'emprunt) ou à l'État (les impôts). La <strong>Capacité d'Autofinancement (CAF)</strong>, c'est l'énergie finale qu'il reste au restaurant pour se payer de nouvelles machines ou rembourser ses dettes.</p>
+            </div>
+        </div>
+
+        <h2>La méthode Additive (À partir de l'EBE)</h2>
+        <p>Pour un gérant de restaurant, c'est la méthode la plus logique. On prend l'EBE (notre performance sur le terrain), et on enlève simplement les frais financiers et les impôts pour trouver le vrai cash disponible.</p>
+
+        <div class="battery-station">
+            <h3>Station de Recharge Financière</h3>
+            
+            <div class="formula-box" id="formula-display">
+                CAF = EBE (En attente...)
+            </div>
+
+            <div class="battery-container">
+                <div class="battery-top"></div>
+                <div class="battery-level" id="battery-fill"></div>
+            </div>
+
+            <button class="charge-btn" id="btn-ebe" onclick="etape1()">1. Injecter l'EBE (+ 20 000€)</button>
+            <button class="charge-btn" id="btn-interets" onclick="etape2()" disabled>2. Payer les intérêts (- 2 000€)</button>
+            <button class="charge-btn" id="btn-impots" onclick="etape3()" disabled>3. Payer l'Impôt (- 3 000€)</button>
+        </div>
+
+        <div style="background: #f0fdf4; border-left: 5px solid var(--primary); padding: 15px; margin-top: 20px;">
+            <strong>💡 À quoi sert cette CAF ?</strong> À rembourser le capital de vos emprunts, à épargner pour l'avenir, ou à distribuer des dividendes si vous avez des associés. Sans CAF, le moteur de la crêperie cale !
+        </div>
+
     </div>
 
-    <div id="main-interface">
-        <header>
-            <div class="sound-badge">🔊 Audio Actif</div>
-            <h1>La Capacité d'Autofinancement 🔋</h1>
-            <p>— Module Expert AMLHR (Hôtellerie-Restauration) - CFA Interpro</p>
-        </header>
-
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-step active" onclick="handleStepClick(0)">1. Le Concept</div>
-            <div class="progress-step" onclick="handleStepClick(1)">2. Les 2 Méthodes</div>
-            <div class="progress-step" onclick="handleStepClick(2)">3. L'Utilisation</div>
-            <div class="progress-step" onclick="handleStepClick(3)">4. Connexions</div>
-            <div class="progress-step" onclick="handleStepClick(4)">Évaluation</div>
-        </div>
-
-        <div class="content-section" id="sec0">
-            <h2>I. La CAF : L'Énergie Vitale du Pilote</h2>
-            <p>Rappelez-vous notre module sur la sécurité financière. Nous avons vu que la survie repose sur un équilibre délicat :</p>
-            <ul>
-                <li><strong>La Rentabilité :</strong> Faire du bénéfice sur le papier (le Compte de Résultat).</li>
-                <li><strong>La Solvabilité :</strong> Avoir le cash en banque pour payer ses dettes (le Bilan).</li>
-            </ul>
-            
-            <div class="visual-panel">
-                <p><strong>Mais comment transformer ce bénéfice théorique en argent réel ?</strong><br>
-                C'est là qu'intervient la <strong>Capacité d'Autofinancement (CAF)</strong>. C'est l'indicateur pivot. Il mesure la "richesse en cash" (flux de trésorerie potentiel) que votre food-truck ou votre hôtel a réussi à sécréter <em>par lui-même</em>, grâce à son activité normale, sans avoir à demander de l'argent au banquier ou aux actionnaires.</p>
-            </div>
-
-            <div class="exercise-box">
-                <span class="exercise-title">🎯 Mission 1 : Le Rôle de la Batterie</span>
-                <p>Un jeune restaurateur chartrain vous demande ce que signifie concrètement avoir une bonne "CAF" à la fin de l'année. Que lui répondez-vous ?</p>
-                <select id="q0_select">
-                    <option value="">-- Choisissez la bonne définition --</option>
-                    <option value="bilan">C'est la valeur de revente de tout le matériel de sa cuisine.</option>
-                    <option value="caf">C'est la trésorerie potentielle que son activité a générée par elle-même pour se développer.</option>
-                    <option value="perte">C'est le montant total de ses dettes fournisseurs.</option>
-                </select>
-                <br>
-                <button class="btn" onclick="checkIntro()">Expliquer au restaurateur</button>
-                <div class="feedback" id="fb0"></div>
-            </div>
-        </div>
-
-        <div class="content-section" id="sec1">
-            <h2>II. Les Deux Chemins vers la CAF</h2>
-            <p>En comptabilité, on ne laisse rien au hasard. Il existe deux méthodes strictement normalisées pour calculer l'énergie générée par votre entreprise. Elles croisent les données des Soldes Intermédiaires de Gestion (SIG) que nous avons vus au chapitre précédent.</p>
-
-            <table>
-                <tr>
-                    <th style="width:50%; background:#d1fae5;">➕ La Méthode Additive (La Base)</th>
-                    <th style="width:50%; background:#ede9fe;">➖ La Méthode Soustractive (Le Raccourci)</th>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>Point de départ : L'EBE (Excédent Brut d'Exploitation)</strong><br><br>
-                        On part du centre du compte de résultat. L'EBE est le roi de la rentabilité opérationnelle. On va lui rajouter les autres encaissements et lui soustraire les décaissements (intérêts, impôts).
-                    </td>
-                    <td>
-                        <strong>Point de départ : Le Résultat Net</strong><br><br>
-                        On part de la ligne finale, tout en bas. On prend le bénéfice final et on le "nettoie" en retirant tout ce qui n'est pas un vrai flux de trésorerie (comme les dotations aux amortissements, qui sont juste une dépréciation sur le papier).
-                    </td>
-                </tr>
-            </table>
-
-            <div class="exercise-box">
-                <span class="exercise-title">🎯 Mission : L'Aiguillage des Méthodes</span>
-                <p>Votre expert-comptable décide d'utiliser la méthode <strong>Additive</strong> pour calculer votre CAF de l'année. Sur quel Solde Intermédiaire de Gestion (SIG) va-t-il baser son tout premier calcul ?</p>
-                <div class="radio-group">
-                    <input type="radio" id="q1_1" name="q1" value="net"> <label for="q1_1">Le Résultat Net.</label><br>
-                    <input type="radio" id="q1_2" name="q1" value="marge"> <label for="q1_2">La Marge Commerciale.</label><br>
-                    <input type="radio" id="q1_3" name="q1" value="ebe"> <label for="q1_3">L'EBE (Excédent Brut d'Exploitation).</label>
-                </div>
-                <button class="btn" onclick="checkMethods()">Indiquer le point de départ</button>
-                <div class="feedback" id="fb1"></div>
-            </div>
-        </div>
-
-        <div class="content-section" id="sec2">
-            <h2>III. À quoi sert cette Énergie ?</h2>
-            <p>Générer une belle CAF, c'est fantastique. Mais que fait-on de cette montagne de "cash potentiel" ? Dans un hôtel-restaurant, cette ressource interne a trois objectifs vitaux :</p>
-
-            <div class="formula-box">
-                CAF = Rembourser les dettes + Réinvestir + Verser des dividendes
-            </div>
-
-            <ul>
-                <li>💳 <strong>Rembourser le banquier :</strong> La CAF sert d'abord à payer les mensualités de vos emprunts (le capital). Sans CAF, la banque refuse les prêts !</li>
-                <li>🏗️ <strong>Investir :</strong> Racheter un nouveau four, refaire la déco des chambres, sans s'endetter à nouveau. (C'est l'autofinancement pur).</li>
-                <li>💰 <strong>Rémunérer les actionnaires :</strong> Verser des dividendes aux patrons pour les récompenser de leur investissement initial.</li>
-            </ul>
-
-            <div class="exercise-box">
-                <span class="exercise-title">🎯 Mission Diagnostic : Le Banquier Inquiet</span>
-                <p>Vous demandez un prêt de 100 000 € à la banque pour ouvrir un deuxième food-truck à Luisant. Le banquier regarde vos comptes et refuse net en pointant votre CAF, pourtant légèrement positive (5 000 €). Pourquoi ?</p>
-                <select id="q2_select">
-                    <option value="">-- Émettez le diagnostic --</option>
-                    <option value="faux">Parce que le food-truck n'est pas un bâtiment en dur.</option>
-                    <option value="correct">Parce que votre CAF (5000€) est trop faible pour réussir à rembourser sereinement les futures mensualités du nouveau crédit.</option>
-                    <option value="faux2">Parce qu'il veut que vous utilisiez la méthode soustractive.</option>
-                </select>
-                <br>
-                <button class="btn" onclick="checkUsage()">Analyser le refus</button>
-                <div class="feedback" id="fb2"></div>
-            </div>
-        </div>
-
-        <div class="content-section" id="sec3">
-            <h2>IV. Les Connexions avec le Tableau de Bord</h2>
-            <p>La CAF ne flotte pas dans le vide. Elle est le lien mécanique parfait entre le résultat de votre année et le bilan de l'entreprise.</p>
-            
-            <div class="visual-panel">
-                <!-- SVG Connexions -->
-                <svg class="cartoon-svg" width="200" height="80" viewBox="0 0 200 80">
-                    <rect x="10" y="20" width="50" height="40" rx="5" fill="#f59e0b" stroke="#1e293b" stroke-width="3"/>
-                    <text x="35" y="45" font-size="12" font-weight="bold" text-anchor="middle" fill="#1e293b">CAF</text>
-                    
-                    <path d="M 60 40 L 90 40" stroke="#1e293b" stroke-width="4" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
-                    
-                    <rect x="95" y="20" width="95" height="40" rx="5" fill="#10b981" stroke="#1e293b" stroke-width="3"/>
-                    <text x="142" y="45" font-size="11" font-weight="bold" text-anchor="middle" fill="#1e293b">TRESORERIE & FR</text>
-
-                    <defs>
-                        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e293b"/>
-                        </marker>
-                    </defs>
-                </svg>
-                <p style="text-align: left; margin-top: 15px;">
-                <strong>1. Avec le Cycle d'Exploitation :</strong> La CAF, c'est le carburant qui va alimenter votre compte en banque (la trésorerie) pour pouvoir racheter des matières premières.<br>
-                <strong>2. Avec le Bilan Fonctionnel :</strong> La CAF non distribuée en dividendes vient s'ajouter à vos capitaux propres. Elle <strong>augmente donc vos Ressources Stables</strong>, ce qui renforce votre Fonds de Roulement (FR) !
-                </p>
-            </div>
-
-            <div class="exercise-box">
-                <span class="exercise-title">🎯 Mission Stratégie : Renforcer le Socle</span>
-                <p>À la fin de l'année, votre gîte rural a généré une CAF de 30 000 €. Si vous décidez de ne pas distribuer de dividendes et de tout garder dans l'entreprise, quel indicateur du bilan allez-vous mécaniquement renforcer ?</p>
-                <div class="radio-group">
-                    <input type="radio" id="q3_1" name="q3" value="dettes"> <label for="q3_1">Le niveau d'endettement à court terme.</label><br>
-                    <input type="radio" id="q3_2" name="q3" value="fr"> <label for="q3_2">Les Ressources Stables, ce qui consolide le Fonds de Roulement (FR).</label><br>
-                </div>
-                <button class="btn" onclick="checkConnections()">Valider la stratégie</button>
-                <div class="feedback" id="fb3"></div>
-            </div>
-        </div>
-
-        <div class="content-section" id="sec4">
-            <h2>L'Évaluation du Pilote 📋</h2>
-            <p>Validez vos acquis sur la Capacité d'Autofinancement pour certifier ce module.</p>
-
-            <div class="exercise-box" style="background-color: #f8fafc; border-color: #0f172a;">
-                <span class="exercise-title" style="color: #0f172a;">📝 QCM de Synthèse (10 questions)</span>
-                
-                <div class="qcm-question"><p>1. Que signifie le sigle CAF ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm1" value="A"> <label>Capacité d'Autofinancement.</label> <input type="radio" name="qcm1" value="B"> <label>Caisse d'Allocations Familiales.</label></div>
-                </div>
-                <div class="qcm-question"><p>2. Dans l'analogie du pilotage, que représente la CAF ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm2" value="A"> <label>La capacité du moteur à générer ses propres ressources (son carburant interne).</label> <input type="radio" name="qcm2" value="B"> <label>L'altimètre de sécurité.</label></div>
-                </div>
-                <div class="qcm-question"><p>3. Quelles sont les deux méthodes légales de calcul de la CAF ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm3" value="A"> <label>La méthode Multiplicative et la méthode Divisive.</label> <input type="radio" name="qcm3" value="B"> <label>La méthode Additive et la méthode Soustractive.</label></div>
-                </div>
-                <div class="qcm-question"><p>4. Sur quel solde démarre la méthode ADDITIVE ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm4" value="A"> <label>L'Excédent Brut d'Exploitation (EBE).</label> <input type="radio" name="qcm4" value="B"> <label>Le Résultat Net de l'exercice.</label></div>
-                </div>
-                <div class="qcm-question"><p>5. Sur quel solde démarre la méthode SOUSTRACTIVE ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm5" value="A"> <label>La Marge Commerciale.</label> <input type="radio" name="qcm5" value="B"> <label>Le Résultat Net de l'exercice.</label></div>
-                </div>
-                <div class="qcm-question"><p>6. À quoi sert en priorité la CAF générée par une entreprise ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm6" value="A"> <label>À rembourser les emprunts bancaires, investir et verser des dividendes.</label> <input type="radio" name="qcm6" value="B"> <label>À payer la facture d'électricité quotidienne.</label></div>
-                </div>
-                <div class="qcm-question"><p>7. La sécurité financière d'une entreprise repose sur deux piliers, quels sont-ils ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm7" value="A"> <label>La Rentabilité et la Solvabilité.</label> <input type="radio" name="qcm7" value="B"> <label>Les Clients et les Fournisseurs.</label></div>
-                </div>
-                <div class="qcm-question"><p>8. Quel impact a une forte CAF conservée (mise en réserve) sur le Bilan Fonctionnel ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm8" value="A"> <label>Elle augmente les dettes circulantes.</label> <input type="radio" name="qcm8" value="B"> <label>Elle consolide les Ressources Stables et donc le Fonds de Roulement (FR).</label></div>
-                </div>
-                <div class="qcm-question"><p>9. Une entreprise très rentable (bons SIG) peut-elle se retrouver en danger vital ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm9" value="A"> <label>Oui, si sa CAF ne se transforme pas en trésorerie et qu'elle devient insolvable (elle ne peut plus payer ses dettes).</label> <input type="radio" name="qcm9" value="B"> <label>Non, la rentabilité papier garantit toujours la survie.</label></div>
-                </div>
-                <div class="qcm-question"><p>10. Quel est le lien direct entre la CAF et le Cycle d'Exploitation (le quotidien) ?</p>
-                    <div class="radio-group"><input type="radio" name="qcm10" value="A"> <label>La CAF alimente la trésorerie indispensable pour acheter, produire et vendre.</label> <input type="radio" name="qcm10" value="B"> <label>Il n'y a aucun lien, ce sont deux mondes séparés.</label></div>
-                </div>
-
-                <button class="btn" style="background: var(--accent); color: var(--dark);" onclick="checkGrandQCM()">Valider l'expertise financière</button>
-                <div class="feedback" id="fb_qcm"></div>
-            </div>
-        </div>
-
-        <div class="nav-buttons">
-            <button class="btn-nav" id="btnPrev" onclick="changeSection(-1)" style="visibility: hidden;">◀ Rétropédaler</button>
-            <button class="btn-nav" id="btnNext" onclick="changeSection(1)">Suivant ▶</button>
-        </div>
+    <div class="navigation-bar">
+        <a href="5 Les SIG.html" class="nav-btn">⬅️ Retour</a>
+        <a href="index.html" class="nav-btn">🏠 Table des Matières</a>
+        <a href="7 Le pilotage des flux financier.html" class="nav-btn">Plan de Vol Suivant ➡️</a>
     </div>
 </div>
 
 <script>
-    // --- MOTEUR AUDIO ET ETAT ---
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-    let originalSections = [];
-    let isTyping = false;
-    let skipTyping = false;
-    let currentIdx = 0;
-    let globalTypeCounter = 0;
-    const totalSections = 5; 
+    let caf = 0;
+    const batteryFill = document.getElementById('battery-fill');
+    const formulaDisplay = document.getElementById('formula-display');
 
-    document.addEventListener("DOMContentLoaded", () => {
-        for (let i = 0; i < totalSections; i++) {
-            const sec = document.getElementById(`sec${i}`);
-            if(sec) {
-                originalSections[i] = sec.cloneNode(true);
-                sec.innerHTML = ''; 
-                sec.classList.remove('active');
-            }
-        }
-    });
-
-    function startCourse() {
-        if (!audioCtx) audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        document.getElementById('welcome-screen').style.display = 'none';
-        document.getElementById('main-interface').style.display = 'block';
-        playSound('nav');
-        showSection(0);
+    function etape1() {
+        caf = 20000;
+        batteryFill.style.height = "100%";
+        batteryFill.style.backgroundColor = "#10b981"; // Vert
+        formulaDisplay.innerHTML = "CAF = EBE (20 000€)";
+        
+        document.getElementById('btn-ebe').disabled = true;
+        document.getElementById('btn-interets').disabled = false;
     }
 
-    function playSound(type) {
-        if (!audioCtx || audioCtx.state === 'suspended') return;
-        const now = audioCtx.currentTime;
-        if (type === 'nav') {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.08);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'success' || type === 'fanfare') {
-            const notes = type === 'success' ? [440, 554.37, 659.25, 880] : [523.25, 659.25, 783.99, 1046.50];
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'triangle'; osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0, now + i * 0.1); gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.02);
-                gain.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.2);
-                osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.2);
-            });
-        } else if (type === 'error') {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now); osc.stop(now + 0.3);
-        }
+    function etape2() {
+        caf -= 2000;
+        batteryFill.style.height = "85%";
+        batteryFill.style.backgroundColor = "#eab308"; // Jaune
+        formulaDisplay.innerHTML = "CAF = 20 000€ - 2 000€ (Intérêts)";
+        
+        document.getElementById('btn-interets').disabled = true;
+        document.getElementById('btn-impots').disabled = false;
     }
 
-    let lastTick = 0;
-    function playTick() {
-        if (!audioCtx || audioCtx.state === 'suspended') return;
-        const now = audioCtx.currentTime;
-        if (now - lastTick < 0.03) return; 
-        lastTick = now;
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sine'; osc.frequency.setValueAtTime(600 + Math.random() * 200, now); 
-        gain.gain.setValueAtTime(0.015, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-        osc.start(now); osc.stop(now + 0.02);
-    }
-
-    // --- STREAMING_CHUNK: DOM rendering and typewriter recursive function... ---
-    async function typeNode(node, container, counter) {
-        if (counter !== globalTypeCounter) return;
-        if (skipTyping) { container.appendChild(node.cloneNode(true)); return; }
-
-        if (node.nodeType === 1) { 
-            if (node.classList && (node.classList.contains('visual-panel') || node.classList.contains('exercise-box') || node.tagName === 'TABLE')) {
-                container.appendChild(node.cloneNode(true)); return;
-            }
-            const clone = node.cloneNode(false);
-            container.appendChild(clone);
-            for (let child of Array.from(node.childNodes)) { await typeNode(child, clone, counter); }
-        } else if (node.nodeType === 3) { 
-            const text = node.nodeValue;
-            if (!text.trim()) { container.appendChild(document.createTextNode(text)); return; }
-            let textNode = document.createTextNode('');
-            container.appendChild(textNode);
-            const charArray = Array.from(text); 
-            let i = 0; const charsPerFrame = 3; 
-            while(i < charArray.length) {
-                if (counter !== globalTypeCounter) return;
-                if (skipTyping) { textNode.nodeValue = text; break; }
-                let chunk = '';
-                for(let j=0; j < charsPerFrame && i < charArray.length; j++, i++) chunk += charArray[i];
-                textNode.nodeValue += chunk;
-                if (i % 6 === 0) playTick();
-                await new Promise(r => requestAnimationFrame(r));
-            }
-        }
-    }
-
-    async function showSection(idx) {
-        if (idx < 0 || idx >= totalSections) return;
-        globalTypeCounter++; const currentCounter = globalTypeCounter;
-        if(document.getElementById(`sec${currentIdx}`)) document.getElementById(`sec${currentIdx}`).classList.remove('active');
-        document.querySelectorAll('.progress-step')[currentIdx]?.classList.remove('active');
-        currentIdx = idx;
-        const targetSec = document.getElementById(`sec${currentIdx}`);
-        targetSec.classList.add('active');
-        document.querySelectorAll('.progress-step')[currentIdx].classList.add('active');
-        document.getElementById('btnPrev').style.visibility = (currentIdx === 0) ? 'hidden' : 'visible';
-        targetSec.innerHTML = ''; skipTyping = false; isTyping = true;
-        updateNextButton();
-
-        for (let child of Array.from(originalSections[idx].childNodes)) {
-            if (currentCounter !== globalTypeCounter) return;
-            if (skipTyping) targetSec.appendChild(child.cloneNode(true));
-            else await typeNode(child, targetSec, currentCounter);
-        }
-        if (currentCounter === globalTypeCounter) { isTyping = false; updateNextButton(); }
-    }
-
-    function updateNextButton() {
-        const btn = document.getElementById('btnNext');
-        if (isTyping) { btn.innerText = "Accélérer ⏩"; btn.classList.add('skip-mode'); } 
-        else { btn.innerText = (currentIdx === totalSections - 1) ? "Terminer 🏁" : "Suivant ▶"; btn.classList.remove('skip-mode'); }
-    }
-
-    function handleStepClick(idx) {
-        playSound('nav');
-        if (isTyping && idx === currentIdx) { skipTyping = true; return; }
-        showSection(idx);
-    }
-
-    function changeSection(direction) {
-        playSound('nav');
-        if (isTyping && direction > 0) { skipTyping = true; return; }
-        let target = currentIdx + direction;
-        if (target >= 0 && target < totalSections) { showSection(target); window.scrollTo(0, 0); }
-    }
-
-    // --- STREAMING_CHUNK: Exercise verification logic functions... ---
-    function checkIntro() {
-        const val = document.getElementById('q0_select').value;
-        const fb = document.getElementById('fb0');
-        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Choisissez une définition !"; return; }
-
-        if (val === "caf") {
-            playSound('success'); fb.className = "feedback success";
-            fb.innerHTML = "🎯 C'EST EXACT ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>La CAF ne mesure pas la trésorerie immédiate (l'argent sur le compte à la seconde T), mais le *potentiel* de trésorerie généré par l'exploitation. C'est la capacité de l'entreprise à s'autofinancer de manière indépendante.</div>";
-        } else {
-            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Faux ! La CAF (Capacité d'Autofinancement) mesure bien la capacité à générer de la richesse en interne. Ce n'est ni le matériel (bilan) ni les dettes.";
-        }
-    }
-
-    function checkMethods() {
-        const choice = document.querySelector('input[name="q1"]:checked');
-        const fb = document.getElementById('fb1');
-        if (!choice) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Faites votre choix !"; return; }
-
-        if (choice.value === "ebe") {
-            playSound('success'); fb.className = "feedback success";
-            fb.innerHTML = "🎯 EXACTEMENT ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>La méthode additive est basée sur l'EBE (qui est déjà un flux de trésorerie d'exploitation). On y *ajoute* ensuite d'autres produits encaissables. La méthode soustractive, elle, part du bas (le Résultat Net) pour remonter.</div>";
-        } else {
-            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Erreur ! Le Résultat Net, c'est pour la méthode *soustractive* ! La méthode *additive* part du coeur de la machine : l'EBE.";
-        }
-    }
-
-    function checkUsage() {
-        const val = document.getElementById('q2_select').value;
-        const fb = document.getElementById('fb2');
-        if (!val) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Émettez votre diagnostic !"; return; }
-
-        if (val === "correct") {
-            playSound('success'); fb.className = "feedback success";
-            fb.innerHTML = "🎯 DIAGNOSTIC VALIDÉ. <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>C'est le nerf de la guerre. Les banquiers analysent le ratio de couverture de la dette. Si la CAF générée n'est pas suffisante pour couvrir les mensualités du prêt demandé, le crédit est refusé, même avec un bon bénéfice comptable.</div>";
-        } else {
-            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Ce n'est pas ça ! Le banquier s'inquiète uniquement de votre capacité de remboursement. Une CAF de 5000€ est trop faible pour assumer un prêt de 100 000€ !";
-        }
-    }
-
-    function checkConnections() {
-        const choice = document.querySelector('input[name="q3"]:checked');
-        const fb = document.getElementById('fb3');
-        if (!choice) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Sélectionnez une stratégie !"; return; }
-
-        if (choice.value === "fr") {
-            playSound('success'); fb.className = "feedback success";
-            fb.innerHTML = "🎯 STRATÉGIE OPTIMALE ! <div class='critic-block'><div class='critic-title'>🔍 Auto-critique certifiée :</div>La CAF non distribuée part en \"Réserves\" (Capitaux Propres). Les Capitaux Propres faisant partie des Ressources Stables du Bilan, cela augmente mathématiquement le Fonds de Roulement (FR). La boucle est bouclée !</div>";
-        } else {
-            playSound('error'); fb.className = "feedback error"; fb.innerHTML = "❌ Erreur de flux ! Conserver l'argent dans l'entreprise (en réserves) renforce sa structure à long terme, c'est-à-dire ses Ressources Stables (et donc le FR).";
-        }
-    }
-
-    function checkGrandQCM() {
-        const correctAnswers = ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A', 'A'];
-        let score = 0, missing = false;
-
-        for (let i = 1; i <= 10; i++) {
-            const choice = document.querySelector(`input[name="qcm${i}"]:checked`);
-            if (!choice) { missing = true; break; }
-            if (choice.value === correctAnswers[i-1]) score++;
-        }
-
-        const fb = document.getElementById('fb_qcm');
-        if (missing) { playSound('error'); fb.className = "feedback error"; fb.innerHTML = "⚠️ Répondez aux 10 questions pour valider l'examen !"; return; }
-
-        if (score >= 8) {
-            playSound('fanfare'); fb.className = "feedback success";
-            fb.innerHTML = `🏆 DIPLÔME VALIDÉ ! Score : ${score}/10. Vous maîtrisez parfaitement la mécanique de la CAF. <div class='critic-block'><div class='critic-title'>🔍 Bilan Certifié :</div>Vous avez compris le lien crucial entre les flux du compte de résultat (SIG) et l'enrichissement structurel du bilan (FR). C'est le niveau attendu d'un manager AMLHR performant !</div>`;
-        } else if (score >= 5) {
-            playSound('success'); fb.className = "feedback success"; fb.innerHTML = `✅ CORRECT. Score : ${score}/10. Le principe de la CAF est compris, mais révisez bien la différence entre méthode Additive et Soustractive.`;
-        } else {
-            playSound('error'); fb.className = "feedback error"; fb.innerHTML = `❌ BATTERIE FAIBLE. Score : ${score}/10. Le moteur cale. Il faut revoir ce chapitre pour comprendre comment votre entreprise s'autofinance !`;
-        }
+    function etape3() {
+        caf -= 3000;
+        batteryFill.style.height = "70%";
+        batteryFill.style.backgroundColor = "#14b8a6"; // Teal final
+        formulaDisplay.innerHTML = "CAF Finale = 15 000 € ⚡";
+        
+        document.getElementById('btn-impots').disabled = true;
     }
 </script>
 
